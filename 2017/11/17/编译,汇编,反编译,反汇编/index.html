@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        编译,汇编,反编译,反汇编 · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">编译,汇编,反编译,反汇编</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            编译,汇编,反编译,反汇编
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = 计算机基础>计算机基础</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/11/17</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="编译-汇编-反编译-反汇编"><a href="#编译-汇编-反编译-反汇编" class="headerlink" title="编译,汇编,反编译,反汇编"></a>编译,汇编,反编译,反汇编</h1><h2 id="编程"><a href="#编程" class="headerlink" title="编程"></a>编程</h2><p>要理解这个问题，先要看「正」编译的过程是怎样的。你有一个想法，这是一种人类自然语言可以表达出来的东西。你利用编程技能，把它「翻译」成你熟悉的一种编程语言:<br><img src="https://pic1.zhimg.com/50/a8d9a453d077c8039f30841108969158_hd.png" alt="编程"><br>这个过程叫做编程。然后你使用编译器（compiler）将它翻译成机器所能理解的语言:</p>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p><img src="https://pic2.zhimg.com/50/0b63c79d2e20558ddf5c8e56ef39cae5_hd.png" alt="编译"><br>这个过程叫做编译。编程和编译都是「信息丢失」的过程。比如你说，我有一组整数，我要把这些数排个序，然后轻车熟路地写了个冒泡排序。然而一定程度上，你的原始动机其实已经从代码里丢失了——有经验的人可以一眼看出这段代码是在排序，而新手小明看到的只有一些 for 和 if 之类的东西。如果是更复杂的功能，可能过一段时间你自己都看不懂自己当时是想干什么。从程序语言到机器语言的过程其实也是一样的。这两个过程其实都是把「做什么」转换成「怎么做」的过程，转换完成之后，究竟一开始是要做什么，这个信息已经丢失了。所谓「反编译」，其实就是找回这些丢失的信息的过程。从这个角度上来说，你阅读一段代码的过程，其实就是在将它「反编译」成自然语言。如果要完美地反编译，那只存在一种可能，就是信息完全没有丢失——比如说你阅读的这段代码有充分的注释，或者它使用了一种你所知晓的模式（这也是为什么大家一再强调注释和设计模式的重要性）。对于从机器语言到程序语言的反编译过程，也是一样。</p>
+<h2 id="汇编"><a href="#汇编" class="headerlink" title="汇编"></a>汇编</h2><p>比如说有比反编译更低级（非贬义）的过程，叫做反汇编:<br><img src="https://pic4.zhimg.com/50/120f4bdad94ab3198a606fe67a81f51b_hd.png" alt=""><br>严格来说汇编语言也是一种编程语言，不过我们在这里把它和我们常说的高级编程语言（包括C语言）区分开。这个步骤里，我在汇编和机器语言里使用的是双向实线箭头，因为它们是可以互相转换的。从汇编语言到机器语言的过程中没有丢失任何信息——因为两者的指令是一一对应的，因此反汇编可以轻松达成。这就是很多程序语言只能反汇编、不能（难以,下同）反编译的原因。一般我们管这种语言叫「编译语言」，又称「原生语言」。代表有C、C++等。</p>
+<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><p>那为什么有的语言可以反编译呢？这又要从机器语言说起。就像不同地域的人所用的语言不同一样，不同的机器说的语言也不尽相同。用行话说，叫「指令集不同」。比方说，你的电脑和你的手机，指令集通常是不一样的。一段程序要让不同的机器都能执行，只能分别翻译（编译）成相应的机器语言。这个过程太麻烦了，于是人们想了个办法，搞出了一种叫解释语言的东西（此处未考证解释语言是否就是因此发明的，只是帮助理解）。如下图：<br><img src="https://pic1.zhimg.com/50/f777de7083d68e0cbfe984fdad05651c_hd.png" alt=""><br>解释语言有两种执行方式，这取决于执行端的「解释器」是如何工作的。<br>一种是直接解释执行，中间就没有机器语言什么事情了，但这种方式效率很低。因此现代的解释语言基本上都会采用第二种方式，<br>也就是经由图中上部的路径，先通过JIT编译的方式翻译成机器语言，然后再执行，保证执行效率。JIT编译大致可以理解为「用到什么就编译什么」，这个过程常常是在执行过程中同步进行的。「解释器」的英文interpreter，其实就是名词「翻译」的意思。这好比你国外交部发了封文件到各国大使馆，再由大使馆的工作人员分别翻译成相应的语言，传达给目标国相关部门。代表性的解释语言如Javascript，它要在不同机器的浏览器上都能正确执行，所以采用这种方式。但是这样一来，程序代码就必须提供给每一台执行端机器了。这可是泄密啊。对于防止泄密，最直接的方式自然是加密。<br><img src="https://pic1.zhimg.com/50/922d6b8b311081bdcbc3889d42878594_hd.png" alt=""><br>有锁就有钥匙，同时也有开锁术；有加密解密，也有相应的破解方式。这时候所谓的「反编译」，其实就是破解加密算法。这一点就不展开聊了。</p>
+<h2 id="字节码-中间语言"><a href="#字节码-中间语言" class="headerlink" title="字节码/中间语言"></a>字节码/中间语言</h2><p>后来，人们觉得解释语言执行得实在有点慢，于是又想了一个办法：把一些可以前期做掉的工作先做掉，只留着那些跟目标机器有关的工作，到时候再说。于是程序被处理成了一种叫做「中间语言」，或者叫「字节码」的东西：<br><img src="https://pic1.zhimg.com/50/3a2b234223758011a467be1eed3c4388_hd.png" alt=""><br>这个过程一般也叫做编译。中间语言词汇少，比较精炼，执行起来也更快。这些语言一般也会用上JIT技术，进一步把中间语言编译成机器语言（而非解释执行），执行效率也就跟那些原生的编译语言不相上下了。这种语言代表性的有C#、Java等。程序语言可以编译成中间语言，反过来，中间语言也可以在一定程度上反编译成程序语言。这是因为采用这种编译方式的编程语言为了保证它们的高级特性（比如说反射），在编译的过程中保留了源程序的绝大部分信息，只有很少的信息丢失；也正是因为丢失了这一部分信息，中间语言通常不能完美地反编译——最常见的就是反编译出来的程序中局部变量的名字都丢了，被替换成了由反编译器自动生成的名字。但这样反编译出来的程序，结构和功能都是完备的，可读性也有一定的保障。一般来说，我们所说的可以反编译的程序都是指这样一类语言写就的程序。中间语言可以被反编译；加密又会被破解，而且执行前还要解密，会带来额外的性能开销。有没有办法能让代码既能有效执行，又不被截获代码的人所利用呢?这时候人们从一些职业素养很差的程序员那里得到了启发。实现一个相同的功能，可以有无数种形式的代码。你恪尽职守，认认真真地写注释，准确地命名函数和变量， 严格按照规范进行缩进和换行;小明却相反，完全没有注释，变量全部用abcd乃至故意误导别人（var mySon = laowang.Son），缩进换行邋遢，尤其是在大括号前不换行，让大家很不满。于是老板想，我们先把小明开除掉，然后给你发奖金并要求大家按照你的方式写代码，并且开发一个工具，唤作「混淆器」，在发布时再把代码处理成小明写的那种样子：<img src="https://pic4.zhimg.com/50/3c927bee733da4bda3c01448f7a561f7_hd.png" data-rawwidth="760" data-rawheight="92" class="origin_image zh-lightbox-thumb" width="760" data-original="https://pic4.zhimg.com/3c927bee733da4bda3c01448f7a561f7_r.png">这样代码即使被反编译和解密了，别人看也看不懂，不小心还会被带到坑里去。代码毕竟是写给人看的，只是偶尔让机器跑一跑，所以没有可读性的代码是没有价值的。这种方法一出，广受好评，于是变成了一种非常普遍的做法。注意图中省略了中间代码和JIT的步骤，混淆通常会跟这些技术一起使用。</p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+            <li class="next">
+                <a href= "/2017/11/17/NTA打洞/" title= NTA打洞 >
+                    <span>Next Post</span>
+                    <span>NTA打洞</span>
+                </a>
+            </li>
+        
+        
+            <li class="previous">
+                <a href= "/2017/11/16/NAT与内网穿透/" title= NAT与内网穿透 >
+                    <span>Previous Post</span>
+                    <span>NAT与内网穿透</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#编译-汇编-反编译-反汇编"><span class="toc-number">1.</span> <span class="toc-text">编译,汇编,反编译,反汇编</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#编程"><span class="toc-number">1.1.</span> <span class="toc-text">编程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译"><span class="toc-number">1.2.</span> <span class="toc-text">编译</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#汇编"><span class="toc-number">1.3.</span> <span class="toc-text">汇编</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#反编译"><span class="toc-number">1.4.</span> <span class="toc-text">反编译</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#字节码-中间语言"><span class="toc-number">1.5.</span> <span class="toc-text">字节码/中间语言</span></a></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+

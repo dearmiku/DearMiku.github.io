@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        iOS安全 -- 越狱检测 · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">iOS安全 -- 越狱检测</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            iOS安全 -- 越狱检测
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = iOS安全>iOS安全</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/11/18</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="iOS安全-–-越狱检测"><a href="#iOS安全-–-越狱检测" class="headerlink" title="iOS安全 – 越狱检测"></a>iOS安全 – 越狱检测</h1><h2 id="越狱是什么"><a href="#越狱是什么" class="headerlink" title="越狱是什么"></a>越狱是什么</h2><p>越狱是指利用iOS系统的默写漏洞,通过指令取得了iOS的root权限.可以自己优化系统，获得系统权限可以修改系统文件，可以安装更多拥有高系统权限的软件，实现更多高级功能!例如：与其他设备蓝牙发送文件、短信回执、来电归属地、文件管理、浏览器下载插件、flash插件、内容管理等等。</p>
+<p>所以在越狱情况下,难免会有一些恶意应用会危害到我们的应用,所以我们需要检测当前是否为越狱环境,从而禁用或者关闭一些功能(如截获我们的网络请求/响应 进行修改,获取我们沙盒的文件,,,,).</p>
+<h2 id="越狱检测方法"><a href="#越狱检测方法" class="headerlink" title="越狱检测方法"></a>越狱检测方法</h2><h3 id="检测沙盒机制和越狱工具"><a href="#检测沙盒机制和越狱工具" class="headerlink" title="检测沙盒机制和越狱工具"></a>检测沙盒机制和越狱工具</h3><p>在越狱环境下,iOS的沙盒机制将被破坏,所以可以去访问本不能访问的路径.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">- (BOOL)checkPath</span><br><span class="line">&#123;</span><br><span class="line">BOOL jailBroken = NO;</span><br><span class="line">NSString * cydiaPath = @&quot;/Applications/Cydia.app&quot;;</span><br><span class="line">NSString * aptPath = @&quot;/private/var/lib/apt&quot;;</span><br><span class="line">if ([[NSFileManager defaultManager] fileExistsAtPath:cydiaPath]) &#123;</span><br><span class="line">     jailBroken = YES;</span><br><span class="line">&#125;</span><br><span class="line">if ([[NSFileManager defaultManager] fileExistsAtPath:aptPath]) &#123;</span><br><span class="line">     jailBroken = YES;</span><br><span class="line">&#125;</span><br><span class="line">return jailBroken;</span><br><span class="line">&#125;</span><br><span class="line">·</span><br><span class="line">上述路径也可替换为以下常见越狱工具路径：</span><br><span class="line">/Library/MobileSubstrate/MobileSubstrate.dylib</span><br><span class="line">/Applications/Cydia.app</span><br><span class="line">/var/lib/cydia/</span><br><span class="line">/var/cache/apt   </span><br><span class="line">/var/lib/apt    </span><br><span class="line">/etc/apt</span><br><span class="line">/bin/bash</span><br><span class="line">/bin/sh</span><br><span class="line">/usr/sbin/sshd   </span><br><span class="line">/usr/libexec/ssh-keysign   </span><br><span class="line">/etc/ssh/sshd_config</span><br></pre></td></tr></table></figure>
+<p>因为有时NSFileManger函数会被hock掉,所以可以使用C语言stat函数进行路径检测</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (BOOL)checkCydia</span><br><span class="line">&#123;</span><br><span class="line">struct stat stat_info;</span><br><span class="line">//路径也可以进行替换</span><br><span class="line">if (0 == stat(&quot;/Applications/Cydia.app&quot;, &amp;stat_info)) &#123;</span><br><span class="line">    return YES;</span><br><span class="line">&#125;</span><br><span class="line">return NO;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="程序运行环境变量检测"><a href="#程序运行环境变量检测" class="headerlink" title="程序运行环境变量检测"></a>程序运行环境变量检测</h3><p>如果设置了 DYLD_INSERT_LIBRARIES 环境变量，那么在程序运行时，动态链接器会先加载该环境变量所指定的动态库；也就是说，这个动态库的加载优先于任何其它的库，包括 libc。</p>
+<p>由于这个环境变量指定的动态库加载的时机实在是太早了，所以对于 app来说，除了代码混淆外，无良策；</p>
+<p>但是我们可以在代码中通过判断环境变量来检测是不是被注入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (BOOL)checkEnv&#123;</span><br><span class="line">char *env = getenv(&quot;DYLD_INSERT_LIBRARIES&quot;);</span><br><span class="line">NSLog(@&quot;%s&quot;, env);</span><br><span class="line">if (env) &#123;</span><br><span class="line">     return YES;</span><br><span class="line">&#125;</span><br><span class="line">return NO;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="验证函数地址"><a href="#验证函数地址" class="headerlink" title="验证函数地址"></a>验证函数地址</h3><p>使用dladdr方法可以获得一个函数所在的模块.从而判断该函数是否被替换掉</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;dlfcn.h&gt;</span><br><span class="line">#include &lt;objc/objc.h&gt;</span><br><span class="line">#include &lt;objc/runtime.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">    Dl_info info;</span><br><span class="line">    IMP imp;</span><br><span class="line">    Method orginalMethod = class_getClassMethod([NSArray class], @selector(description));</span><br><span class="line">    imp = method_getImplementation(orginalMethod);</span><br><span class="line">        if (dladdr(imp, &amp;info)) &#123;</span><br><span class="line">            printf(&quot;dli_fname: %s\n&quot;, info.dli_fname);</span><br><span class="line">            printf(&quot;dli_sname: %s\n&quot;, info.dli_sname);</span><br><span class="line">            printf(&quot;dli_fbase: %p\n&quot;, info.dli_fbase);</span><br><span class="line">            printf(&quot;dli_saddr: %p\n&quot;, info.dli_saddr);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            printf(&quot;error: can&apos;t find that symbol.\n&quot;);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>通过该方法验证指定类的方法是否都来自指定模块(可以根据实际情况自定义修改),建议使用inline方式编译,像这样以内联函数的形式编译,攻击者必须修改每一处调用该函数的的地方</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#include &lt;dlfcn.h&gt;</span><br><span class="line">#include &lt;objc/objc.h&gt;</span><br><span class="line">#include &lt;objc/runtime.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">static inline BOOL validate_methods(const char *cls,const char *fnamePre) __attribute__ ((always_inline));</span><br><span class="line"></span><br><span class="line">BOOL validate_methods(const char *cls,const char *fnamePre)&#123;</span><br><span class="line">    Class aClass = objc_getClass(cls);</span><br><span class="line">    Method *methods;</span><br><span class="line">    unsigned int nMethods;</span><br><span class="line">    Dl_info info;</span><br><span class="line">    IMP imp;</span><br><span class="line">    Method m;</span><br><span class="line">    if(!aClass)</span><br><span class="line">        return NO;</span><br><span class="line">    methods = class_copyMethodList(aClass, &amp;nMethods);</span><br><span class="line">    while (nMethods--) &#123;</span><br><span class="line">        m = methods[nMethods];</span><br><span class="line">        imp = method_getImplementation(m);</span><br><span class="line">        if(!imp)&#123;</span><br><span class="line">            free(methods);</span><br><span class="line">            return NO;</span><br><span class="line">        &#125;</span><br><span class="line">        if(!dladdr(imp, &amp;info))&#123;</span><br><span class="line">            free(methods);</span><br><span class="line">            return NO;</span><br><span class="line">        &#125;</span><br><span class="line">        /*Validate image path*/</span><br><span class="line">        if(!strstr(info.dli_fname, fnamePre))&#123;</span><br><span class="line">            goto FAIL;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return YES;</span><br><span class="line"></span><br><span class="line">FAIL:</span><br><span class="line">    printf(&quot;method %s failed integrity test:\n&quot;,</span><br><span class="line">           (const char *)method_getName(m));</span><br><span class="line">    printf(&quot;    dli_fname:%s\n&quot;,info.dli_fname);</span><br><span class="line">    printf(&quot;    dli_sname:%s\n&quot;,info.dli_sname);</span><br><span class="line">    printf(&quot;    dli_fbase:%p\n&quot;,info.dli_fbase);</span><br><span class="line">    printf(&quot;    dli_saddr:%p\n&quot;,info.dli_saddr);</span><br><span class="line">    free(methods);</span><br><span class="line">    return NO;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后,这种检查方式只能减少被攻击的可能性,不是肯定安全的,也是有可能被绕过的.</p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+            <li class="next">
+                <a href= "/2017/11/18/iOS安全 -- 数据安全/" title= iOS安全 -- 数据安全 >
+                    <span>Next Post</span>
+                    <span>iOS安全 -- 数据安全</span>
+                </a>
+            </li>
+        
+        
+            <li class="previous">
+                <a href= "/2017/11/17/NTA打洞/" title= NTA打洞 >
+                    <span>Previous Post</span>
+                    <span>NTA打洞</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#iOS安全-–-越狱检测"><span class="toc-number">1.</span> <span class="toc-text">iOS安全 – 越狱检测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#越狱是什么"><span class="toc-number">1.1.</span> <span class="toc-text">越狱是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#越狱检测方法"><span class="toc-number">1.2.</span> <span class="toc-text">越狱检测方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测沙盒机制和越狱工具"><span class="toc-number">1.2.1.</span> <span class="toc-text">检测沙盒机制和越狱工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#程序运行环境变量检测"><span class="toc-number">1.2.2.</span> <span class="toc-text">程序运行环境变量检测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#验证函数地址"><span class="toc-number">1.2.3.</span> <span class="toc-text">验证函数地址</span></a></li></ol></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+

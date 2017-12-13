@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        YYAsyncLayer 学习 · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">YYAsyncLayer 学习</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            YYAsyncLayer 学习
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = 第三方框架学习>第三方框架学习</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/11/23</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="YYAsyncLayer-学习"><a href="#YYAsyncLayer-学习" class="headerlink" title="YYAsyncLayer 学习"></a>YYAsyncLayer 学习</h1><h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>YYAsyncLayer是用于图层异步绘制的一个组件,将耗时操作(如文本布局计算)放在RunLoop空闲时去做,进而减少卡顿.</p>
+<h1 id="组件内容"><a href="#组件内容" class="headerlink" title="组件内容"></a>组件内容</h1><p>YYAsyncLayer主要有3个类.</p>
+<blockquote>
+<p>1, <strong>YYTransaction</strong>,负责将 YYAsyncLayer委托的绘制任务在RunLoop空闲时执行.</p>
+<p>2, <strong>YYSentine</strong>, 是一个线程安全的计数器,在进行队列分配和任务取消时作为参考使用</p>
+<p>3, <strong>YYAsyncLayer</strong>, 将其替换为View的Layer类,实现异步绘制</p>
+</blockquote>
+<h2 id="YYTransaction"><a href="#YYTransaction" class="headerlink" title="YYTransaction"></a>YYTransaction</h2><p><code>+ (YYTransaction *)transactionWithTarget:(id)target selector:(SEL)selector;</code>方法创建委托对象.</p>
+<p><code>- (void)commit;</code>方法将委托对象存储在一个全局Set中,在空闲时回调.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">static void YYTransactionSetup() &#123;</span><br><span class="line">    static dispatch_once_t onceToken;</span><br><span class="line">    dispatch_once(&amp;onceToken, ^&#123;</span><br><span class="line">        transactionSet = [NSMutableSet new];</span><br><span class="line">        CFRunLoopRef runloop = CFRunLoopGetMain();</span><br><span class="line">        CFRunLoopObserverRef observer;</span><br><span class="line"></span><br><span class="line">        observer = CFRunLoopObserverCreate(CFAllocatorGetDefault(),</span><br><span class="line">                                           kCFRunLoopBeforeWaiting | kCFRunLoopExit,</span><br><span class="line">                                           true,      // repeat</span><br><span class="line">                                           0xFFFFFF,  // after CATransaction(2000000)</span><br><span class="line">                                           YYRunLoopObserverCallBack, NULL);</span><br><span class="line">        CFRunLoopAddObserver(runloop, observer, kCFRunLoopCommonModes);</span><br><span class="line">        CFRelease(observer);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>空闲回调block</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 因为该对象还要被存放至集合中,当子类实现了isEqual方法时,则同时也要实现 hash方法.</span><br><span class="line"></span><br><span class="line">- (NSUInteger)hash &#123;</span><br><span class="line">    long v1 = (long)((void *)_selector);</span><br><span class="line">    long v2 = (long)_target;</span><br><span class="line">    return v1 ^ v2;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (BOOL)isEqual:(id)object &#123;</span><br><span class="line">    if (self == object) return YES;</span><br><span class="line">    if (![object isMemberOfClass:self.class]) return NO;</span><br><span class="line">    YYTransaction *other = object;</span><br><span class="line">    return other.selector == _selector &amp;&amp; other.target == _target;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这里重载 isEqual方法,确保不会将具有相同target和selector的委托对象放入Set中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">static NSMutableSet *transactionSet = nil;</span><br><span class="line"></span><br><span class="line">static void YYRunLoopObserverCallBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) &#123;</span><br><span class="line">    if (transactionSet.count == 0) return;</span><br><span class="line">    NSSet *currentSet = transactionSet;</span><br><span class="line">    transactionSet = [NSMutableSet new];</span><br><span class="line">    [currentSet enumerateObjectsUsingBlock:^(YYTransaction *transaction, BOOL *stop) &#123;</span><br><span class="line">#pragma clang diagnostic push</span><br><span class="line">#pragma clang diagnostic ignored &quot;-Warc-performSelector-leaks&quot;</span><br><span class="line"></span><br><span class="line">        [transaction.target performSelector:transaction.selector];</span><br><span class="line">#pragma clang diagnostic pop</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建唯一的 <strong>主线程 RunLoop观察者</strong>,在RunLoop进入kCFRunLoopBeforeWaiting 或 退出时 将委托方法调用.</p>
+<h2 id="YYSentine"><a href="#YYSentine" class="headerlink" title="YYSentine"></a>YYSentine</h2><p>YYSentine的实现比较简单,主要是对 <code>OSAtomicIncrement32()</code> 函数的封装, 改函数为一个线程安全的计数器, 它会会保证在 数自增后再对其访问, 在这个框架里他是用来 作为绘制任务是否被取消的参照物的~</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;YYSentinel.h&quot;</span><br><span class="line">#import &lt;libkern/OSAtomic.h&gt;</span><br><span class="line"></span><br><span class="line">@implementation YYSentinel &#123;</span><br><span class="line">    int32_t _value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (int32_t)value &#123;</span><br><span class="line">    return _value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (int32_t)increase &#123;</span><br><span class="line">    return OSAtomicIncrement32(&amp;_value);</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<h2 id="YYAsyncLayer"><a href="#YYAsyncLayer" class="headerlink" title="YYAsyncLayer"></a>YYAsyncLayer</h2><h3 id="队列准备"><a href="#队列准备" class="headerlink" title="队列准备"></a>队列准备</h3><figure class="highlight plain"><figcaption><span>dispatch_queue_t YYAsyncLayerGetDisplayQueue() &#123;</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">#ifdef YYDispatchQueuePool_h</span><br><span class="line">    return YYDispatchQueueGetForQOS(NSQualityOfServiceUserInitiated);</span><br><span class="line">#else</span><br><span class="line">#define MAX_QUEUE_COUNT 16</span><br><span class="line">    static int queueCount;</span><br><span class="line">    static dispatch_queue_t queues[MAX_QUEUE_COUNT];</span><br><span class="line">    static dispatch_once_t onceToken;</span><br><span class="line">    static int32_t counter = 0;</span><br><span class="line">    dispatch_once(&amp;onceToken, ^&#123;</span><br><span class="line"></span><br><span class="line">        //queueCount = 运行该进程的系统的处于激活状态的处理器数量,</span><br><span class="line">        queueCount = (int)[NSProcessInfo processInfo].activeProcessorCount;</span><br><span class="line">        //确保 0&lt;queueCount&lt;16</span><br><span class="line">        queueCount = queueCount &lt; 1 ? 1 : queueCount &gt; MAX_QUEUE_COUNT ? MAX_QUEUE_COUNT : queueCount;</span><br><span class="line"></span><br><span class="line">        //创建指定数量的 串行队列 存放在队列数组中</span><br><span class="line">        if ([UIDevice currentDevice].systemVersion.floatValue &gt;= 8.0) &#123;</span><br><span class="line">            for (NSUInteger i = 0; i &lt; queueCount; i++) &#123;</span><br><span class="line">                dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);</span><br><span class="line">                queues[i] = dispatch_queue_create(&quot;com.ibireme.yykit.render&quot;, attr);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            for (NSUInteger i = 0; i &lt; queueCount; i++) &#123;</span><br><span class="line">                queues[i] = dispatch_queue_create(&quot;com.ibireme.yykit.render&quot;, DISPATCH_QUEUE_SERIAL);</span><br><span class="line">                dispatch_set_target_queue(queues[i], dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    // 此为线程安全的自增计数,每调用一次,+1</span><br><span class="line">    int32_t cur = OSAtomicIncrement32(&amp;counter);</span><br><span class="line"></span><br><span class="line">    NSLog(@&quot;cur:%d counter:%d&quot;,cur,counter);</span><br><span class="line"></span><br><span class="line">    //返回合适的队列</span><br><span class="line">    if (cur &lt; 0) cur = -cur;</span><br><span class="line">    return queues[(cur) % queueCount];</span><br><span class="line">#undef MAX_QUEUE_COUNT</span><br><span class="line">#endif</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>准备若干的串行队列~,将绘制任务分给不同的串行队列, 这里之所以 队列数 和 处理器数 匹配. 不创建过多无效队列.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 释放队列</span><br><span class="line">static dispatch_queue_t YYAsyncLayerGetReleaseQueue() &#123;</span><br><span class="line">#ifdef YYDispatchQueuePool_h</span><br><span class="line">    return YYDispatchQueueGetForQOS(NSQualityOfServiceDefault);</span><br><span class="line">#else</span><br><span class="line">    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);</span><br><span class="line">#endif</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>低优先级的全局队列作为 对象的释放队列,</p>
+<h3 id="代理方法"><a href="#代理方法" class="headerlink" title="代理方法"></a>代理方法</h3><p>YYAsyncLayer的代理方法需要返回一个 DisplayTask对象, 任务对象中包括3个block.分别为willDisplay , display , didDisplay.在绘制的不同阶段执行</p>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">- (instancetype)init &#123;</span><br><span class="line">    self = [super init];</span><br><span class="line">    static CGFloat scale; //global</span><br><span class="line">    static dispatch_once_t onceToken;</span><br><span class="line">    dispatch_once(&amp;onceToken, ^&#123;</span><br><span class="line">        scale = [UIScreen mainScreen].scale;</span><br><span class="line">    &#125;);</span><br><span class="line">    self.contentsScale = scale;</span><br><span class="line">    //默认异步,每个图层都配置一个计数器</span><br><span class="line">    _sentinel = [YYSentinel new];</span><br><span class="line">    _displaysAsynchronously = YES;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//dealloc时 取消绘制</span><br><span class="line">- (void)dealloc &#123;</span><br><span class="line">    [_sentinel increase];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//在再次绘制时,取消上次绘制任务</span><br><span class="line">- (void)setNeedsDisplay &#123;</span><br><span class="line">    [self _cancelAsyncDisplay];</span><br><span class="line">    [super setNeedsDisplay];</span><br><span class="line">&#125;</span><br><span class="line">- (void)display &#123;</span><br><span class="line">    //这个我看不懂~为啥要再赋值一遍</span><br><span class="line">    super.contents = super.contents;</span><br><span class="line">    [self _displayAsync:_displaysAsynchronously];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="绘制方法"><a href="#绘制方法" class="headerlink" title="绘制方法"></a>绘制方法</h3><h4 id="没有绘制任务"><a href="#没有绘制任务" class="headerlink" title="没有绘制任务"></a>没有绘制任务</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if (!task.display) &#123;</span><br><span class="line">    if (task.willDisplay) task.willDisplay(self);</span><br><span class="line">    self.contents = nil;</span><br><span class="line">    if (task.didDisplay) task.didDisplay(self, YES);</span><br><span class="line">    ///执行完其他非空block后 返回</span><br><span class="line">    return;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="异步绘制"><a href="#异步绘制" class="headerlink" title="异步绘制"></a>异步绘制</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">if (task.willDisplay) task.willDisplay(self);</span><br><span class="line">  YYSentinel *sentinel = _sentinel;</span><br><span class="line"></span><br><span class="line">  int32_t value = sentinel.value;</span><br><span class="line"></span><br><span class="line">  //判断是否要取消的block, 在图层的dealloc方法,取消绘制方法中 和 同步绘制方法中 进行线程安全的自增操作. 在调用该block时 若block截取的变量value与对象中value中的值不一致时,则表明当前任务以被取消</span><br><span class="line">  BOOL (^isCancelled)(void) = ^BOOL() &#123;</span><br><span class="line">      return value != sentinel.value;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  CGSize size = self.bounds.size;</span><br><span class="line">  BOOL opaque = self.opaque;</span><br><span class="line">  CGFloat scale = self.contentsScale;</span><br><span class="line"></span><br><span class="line">  // 当图层宽度 或 高度小于 1时 (此时没有绘制意义)</span><br><span class="line">  if (size.width &lt; 1 || size.height &lt; 1) &#123;</span><br><span class="line">      CGImageRef image = (__bridge_retained CGImageRef)(self.contents);</span><br><span class="line">      self.contents = nil;</span><br><span class="line"></span><br><span class="line">      //当图层内容为图像时,讲释放操作留在 并行释放队列中进行</span><br><span class="line">      if (image) &#123;</span><br><span class="line">          dispatch_async(YYAsyncLayerGetReleaseQueue(), ^&#123;</span><br><span class="line">              CFRelease(image);</span><br><span class="line">          &#125;);</span><br><span class="line">      &#125;</span><br><span class="line">      if (task.didDisplay) task.didDisplay(self, YES);</span><br><span class="line">      return;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ///为正常情况</span><br><span class="line">  dispatch_async(YYAsyncLayerGetDisplayQueue(), ^&#123;</span><br><span class="line">      //若发生取消操作,则取消绘制</span><br><span class="line">      if (isCancelled()) return;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">      UIGraphicsBeginImageContextWithOptions(size, opaque, scale);</span><br><span class="line">      CGContextRef context = UIGraphicsGetCurrentContext();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">      task.display(context, size, isCancelled);</span><br><span class="line"></span><br><span class="line">      //若取消 则释放资源,取消绘制</span><br><span class="line">      if (isCancelled()) &#123;</span><br><span class="line">          UIGraphicsEndImageContext();</span><br><span class="line">          dispatch_async(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">              if (task.didDisplay) task.didDisplay(self, NO);</span><br><span class="line">          &#125;);</span><br><span class="line">          return;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      //将上下文转换为图片</span><br><span class="line">      UIImage *image = UIGraphicsGetImageFromCurrentImageContext();</span><br><span class="line">      UIGraphicsEndImageContext();</span><br><span class="line"></span><br><span class="line">      //若取消 则释放资源,取消绘制</span><br><span class="line">      if (isCancelled()) &#123;</span><br><span class="line">          dispatch_async(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">              if (task.didDisplay) task.didDisplay(self, NO);</span><br><span class="line">          &#125;);</span><br><span class="line">          return;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      ///主线程异步 进行最后的绘制操作</span><br><span class="line">      dispatch_async(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">          if (isCancelled()) &#123;</span><br><span class="line">              if (task.didDisplay) task.didDisplay(self, NO);</span><br><span class="line">          &#125; else &#123;</span><br><span class="line">              self.contents = (__bridge id)(image.CGImage);</span><br><span class="line">              if (task.didDisplay) task.didDisplay(self, YES);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+<p>YYAsyncLayer 是通过创建异步创建图像Context在其绘制,最后再主线程异步添加图像 从而实现的异步绘制.同时,在绘制过程中 进行了多次进行取消判断,以免额外绘制.</p>
+<h4 id="同步绘制"><a href="#同步绘制" class="headerlink" title="同步绘制"></a>同步绘制</h4><p>同步绘制就是直接绘制就好了~</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[_sentinel increase];</span><br><span class="line">if (task.willDisplay) task.willDisplay(self);</span><br><span class="line">UIGraphicsBeginImageContextWithOptions(self.bounds.size, self.opaque, self.contentsScale);</span><br><span class="line">CGContextRef context = UIGraphicsGetCurrentContext();</span><br><span class="line">task.display(context, self.bounds.size, ^&#123;return NO;&#125;);</span><br><span class="line">UIImage *image = UIGraphicsGetImageFromCurrentImageContext();</span><br><span class="line">UIGraphicsEndImageContext();</span><br><span class="line">self.contents = (__bridge id)(image.CGImage);</span><br><span class="line">if (task.didDisplay) task.didDisplay(self, YES);</span><br></pre></td></tr></table></figure>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><h2 id="替换当前View的Layer"><a href="#替换当前View的Layer" class="headerlink" title="替换当前View的Layer"></a>替换当前View的Layer</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+ (Class)layerClass &#123;</span><br><span class="line">    return YYAsyncLayer.class;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="修改需要属性时-进行重绘制"><a href="#修改需要属性时-进行重绘制" class="headerlink" title="修改需要属性时 进行重绘制"></a>修改需要属性时 进行重绘制</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">- (void)setText:(NSString *)text &#123;</span><br><span class="line">    _text = text.copy;</span><br><span class="line">    [[YYTransaction transactionWithTarget:self selector:@selector(contentsNeedUpdated)] commit];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)setFont:(UIFont *)font &#123;</span><br><span class="line">    _font = font;</span><br><span class="line">    [[YYTransaction transactionWithTarget:self selector:@selector(contentsNeedUpdated)] commit];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)layoutSubviews &#123;</span><br><span class="line">    [super layoutSubviews];</span><br><span class="line">    [[YYTransaction transactionWithTarget:self selector:@selector(contentsNeedUpdated)] commit];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)contentsNeedUpdated &#123;</span><br><span class="line">    [self.layer setNeedsDisplay];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="实现代理方法-完成绘制任务"><a href="#实现代理方法-完成绘制任务" class="headerlink" title="实现代理方法 完成绘制任务"></a>实现代理方法 完成绘制任务</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">- (YYAsyncLayerDisplayTask *)newAsyncDisplayTask &#123;</span><br><span class="line"></span><br><span class="line">    NSString *text = _text;</span><br><span class="line">    UIFont *font = _font;</span><br><span class="line"></span><br><span class="line">    YYAsyncLayerDisplayTask *task = [YYAsyncLayerDisplayTask new];</span><br><span class="line">    task.willDisplay = ^(CALayer *layer) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    task.display = ^(CGContextRef context, CGSize size, BOOL(^isCancelled)(void)) &#123;</span><br><span class="line">        if (isCancelled()) return;</span><br><span class="line">        //在这里由于绘制文字会颠倒</span><br><span class="line">        [[NSOperationQueue mainQueue] addOperationWithBlock:^&#123;</span><br><span class="line">            CGContextTranslateCTM(context, 0, self.bounds.size.height);</span><br><span class="line">            CGContextScaleCTM(context, 1.0, -1.0);</span><br><span class="line">        &#125;];</span><br><span class="line">        NSAttributedString* str = [[NSAttributedString alloc] initWithString:text attributes:@&#123;NSFontAttributeName:_font&#125;];</span><br><span class="line">        CGContextSetTextPosition(context, 0, font.pointSize);</span><br><span class="line">        CTLineRef line = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)str);</span><br><span class="line">        CTLineDraw(line, context);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    task.didDisplay = ^(CALayer *layer, BOOL finished) &#123;</span><br><span class="line">        if (finished) &#123;</span><br><span class="line">            // finished</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            // cancelled</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    return task;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><p>作为对照,添加UILabel进行对比试验,重写其 <code>-(void)drawRect:</code>方法打印输出比较.<br><img src="/images/YYAsyncLayer学习/效果.png" alt="运行结果"></p>
+<p>由此可知: 同步绘制任务(la2) 在<code>viewDidAppear</code>前完成绘制, 而AsyncLayer则在这之后再开始绘制任务,切绘制方法在异步执行.</p>
+<h1 id="原生API对比"><a href="#原生API对比" class="headerlink" title="原生API对比."></a>原生API对比.</h1><p>关于异步绘制,iOS6 为CALayer添加了新的API <code>drawsAsynchronously</code> 属性.当你设置 drawsAsynchronously = YES 后，-drawRect: 和 -drawInContext: 函数依然实在主线程调用的。但是所有的Core Graphics函数（包括UIKit的绘制API，最后其实还是Core Graphics的调用）不会做任何事情，而是所有的绘制命令会被在后台线程处理。</p>
+<p>这种方式就是先记录绘制命令，然后在后台线程执行。为了实现这个过程，更多的事情不得不做，更多的内存开销。最后只是把一些工作从主线程移动出来。这个过程是需要权衡，测试的。</p>
+<p>这个可能是代价最昂贵的的提高绘制性能的方法，也不会节省很多资源。</p>
+<p>相比之下,AsyncLaye的性能会好一些, 但麻烦的是 绘制实现要自己写<del>~</del></p>
+<h1 id="错误提示"><a href="#错误提示" class="headerlink" title="错误提示"></a>错误提示</h1><p>在我使用的版本(1.0)中 异步绘制的bitmap的scale为1.0 因为+(id)defaultValueForKey:(NSString *)key 方法,所以在使用时 注意修改~~~ 不然显示的画面会有模糊感</p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+            <li class="next">
+                <a href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" title= Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形) >
+                    <span>Next Post</span>
+                    <span>Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</span>
+                </a>
+            </li>
+        
+        
+            <li class="previous">
+                <a href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" title= iOS进程信息 -- NSProgressInfo >
+                    <span>Previous Post</span>
+                    <span>iOS进程信息 -- NSProgressInfo</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#YYAsyncLayer-学习"><span class="toc-number">1.</span> <span class="toc-text">YYAsyncLayer 学习</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#简介"><span class="toc-number">2.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#组件内容"><span class="toc-number">3.</span> <span class="toc-text">组件内容</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#YYTransaction"><span class="toc-number">3.1.</span> <span class="toc-text">YYTransaction</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#YYSentine"><span class="toc-number">3.2.</span> <span class="toc-text">YYSentine</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#YYAsyncLayer"><span class="toc-number">3.3.</span> <span class="toc-text">YYAsyncLayer</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#队列准备"><span class="toc-number">3.3.1.</span> <span class="toc-text">队列准备</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代理方法"><span class="toc-number">3.3.2.</span> <span class="toc-text">代理方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#初始化"><span class="toc-number">3.3.3.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#绘制方法"><span class="toc-number">3.3.4.</span> <span class="toc-text">绘制方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#没有绘制任务"><span class="toc-number">3.3.4.1.</span> <span class="toc-text">没有绘制任务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#异步绘制"><span class="toc-number">3.3.4.2.</span> <span class="toc-text">异步绘制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#同步绘制"><span class="toc-number">3.3.4.3.</span> <span class="toc-text">同步绘制</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用"><span class="toc-number">4.</span> <span class="toc-text">使用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#替换当前View的Layer"><span class="toc-number">4.1.</span> <span class="toc-text">替换当前View的Layer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改需要属性时-进行重绘制"><span class="toc-number">4.2.</span> <span class="toc-text">修改需要属性时 进行重绘制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现代理方法-完成绘制任务"><span class="toc-number">4.3.</span> <span class="toc-text">实现代理方法 完成绘制任务</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#效果"><span class="toc-number">5.</span> <span class="toc-text">效果</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#原生API对比"><span class="toc-number">6.</span> <span class="toc-text">原生API对比.</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#错误提示"><span class="toc-number">7.</span> <span class="toc-text">错误提示</span></a></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+

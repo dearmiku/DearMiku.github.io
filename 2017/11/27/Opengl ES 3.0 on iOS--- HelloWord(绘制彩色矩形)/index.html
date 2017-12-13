@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形) · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/11/27</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>本文记录了我初学Opengl 绘制彩色矩形的过程,可能我对内容的描述不够准确,还请多多指正</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="配置图层"><a href="#配置图层" class="headerlink" title="配置图层"></a>配置图层</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+(Class)layerClass&#123;</span><br><span class="line">    return [CAEAGLLayer class];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将当前View的Layer替换成 <code>CAEAGLLayer</code>类,opengl的绘制内容也是在该View上显示的.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//设置不透明度为YES,因为透明图层性能不好</span><br><span class="line">self.layer.opaque = YES;</span><br><span class="line">self.layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:</span><br><span class="line">                                         [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];</span><br></pre></td></tr></table></figure>
+<p>可以对<code>CAEAGLLayer</code>进行额外属性的配置:</p>
+<blockquote>
+<p>kEAGLDrawablePropertyRetainedBacking 传入布尔值,表示是否保持绘制状态,若设置为NO,则下次将重新绘制.<br>kEAGLDrawablePropertyColorFormat 设置layer的颜色缓冲区格式,EAGLContext对象 使用此格式来创建渲染缓冲区的存储.<br>kEAGLColorFormatRGB565 —&gt; 16bit RGB格式<br>kEAGLColorFormatRGBA8 —&gt; 32-bit RGBA格式</p>
+</blockquote>
+<h2 id="配置上下文"><a href="#配置上下文" class="headerlink" title="配置上下文"></a>配置上下文</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];</span><br><span class="line">    if (!_context) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    // 将当前上下文设置为我们创建的上下文</span><br><span class="line">    if (![EAGLContext setCurrentContext:_context]) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="设置缓冲区-渲染缓冲和帧缓冲"><a href="#设置缓冲区-渲染缓冲和帧缓冲" class="headerlink" title="设置缓冲区(渲染缓冲和帧缓冲)"></a>设置缓冲区(渲染缓冲和帧缓冲)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">//在缓冲区中返回n个渲染缓冲对象句柄,不保证这些句柄是连续的整数,但是肯定没有被使用.</span><br><span class="line">GLuint renderbuffer[1];</span><br><span class="line">glGenRenderbuffers(ARRAY_SIZE(renderbuffer), renderbuffer);</span><br><span class="line"></span><br><span class="line">//将缓冲区对象和句柄 绑定到指定的缓冲区目标.</span><br><span class="line">glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer[0]);</span><br><span class="line"></span><br><span class="line">//检验是否创建绑定成功</span><br><span class="line">if (glIsRenderbuffer(renderbuffer[0]) == GL_TRUE) &#123;</span><br><span class="line">    NSLog(@&quot;成功生成渲染缓存&quot;);</span><br><span class="line">&#125;</span><br><span class="line">//为缓冲区对象分配存储空间.</span><br><span class="line">[self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:layer];</span><br><span class="line"></span><br><span class="line">//设置帧缓冲区(Frame Buffer),和渲染缓冲区大致相同</span><br><span class="line">GLuint framebuffer[1];</span><br><span class="line">glGenFramebuffers(ARRAY_SIZE(framebuffer), framebuffer);</span><br><span class="line">glBindFramebuffer(GL_FRAMEBUFFER, framebuffer[0]);</span><br><span class="line">if (glIsFramebuffer(framebuffer[0]) == GL_TRUE) &#123;</span><br><span class="line">    NSLog(@&quot;成功绑定帧缓存&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//将相关的buffer依附到 帧缓存上 </span><br><span class="line">glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, renderbuffer[0]);</span><br><span class="line"></span><br><span class="line">    //释放渲染缓存</span><br><span class="line">    //glDeleteRenderbuffers(ARRAY_SIZE(renderbuffer), renderbuffer);</span><br><span class="line">    //释放帧缓存</span><br><span class="line">    //glDeleteFramebuffers(ARRAY_SIZE(framebuffer), framebuffer);</span><br></pre></td></tr></table></figure>
+<p>渲染缓存: 是OpenGL ES管理的一块高效内存区域,渲染缓存的数据只有关联一个帧缓存对象才有意义,并且需要保证图像缓存格式 必须与OpenGL ES要求的渲染格式相符.</p>
+<p>帧缓存：它是屏幕所显示画面的一个直接映象，又称为位映射图(Bit Map)或光栅。帧缓存的每一存储单元对应屏幕上的一个像素，整个帧缓存对应一帧图像。</p>
+<h3 id="函数解释"><a href="#函数解释" class="headerlink" title="函数解释"></a>函数解释</h3><p><code>glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, renderbuffer[0]);</code><br>参数:</p>
+<blockquote>
+<p>target: 指定的帧缓冲区目标 必须是 GL_DRAW_FRAMEBUFFER, GL_READ_FRAMEBUFFER, 或 GL_FRAMEBUFFER. (GL_FRAMEBUFFER = GL_DRAW_FRAMEBUFFER);<br>attachment: 帧缓存对象依附的目标 GL_COLOR_ATTACHMENT(0~i) —&gt; 第i个颜色缓存 0为默认值, GL_DEPTH_ATTACHMENT —&gt; 深度缓存, GL_STENCIL_ATTACHMENT —&gt; 模板缓存<br>renderbuffertarget :必须为 GL_RENDERBUFFER,指定的渲染缓存区目标<br>renderbuffer: 渲染缓冲区对象句柄.</p>
+</blockquote>
+<h2 id="准备着色器源码"><a href="#准备着色器源码" class="headerlink" title="准备着色器源码"></a>准备着色器源码</h2><p>OpenGL中，任何事物都在3D空间中，而屏幕和窗口却是2D像素数组，这导致OpenGL的大部分工作都是关于把3D坐标转变为适应你屏幕的2D像素。3D坐标转为2D坐标的处理过程是由OpenGL的<strong>图形渲染管线</strong>.OpenGL中，任何事物都在3D空间中，而屏幕和窗口却是2D像素数组，这导致OpenGL的大部分工作都是关于把3D坐标转变为适应你屏幕的2D像素。3D坐标转为2D坐标的处理过程是由OpenGL的图形渲染管线</p>
+<p><strong>着色器(Shader)</strong>是运行在GPU上的小程序。这些小程序为图形渲染管线的某个特定部分而运行。从基本意义上来说，着色器只是一种把输入转化为输出的程序。着色器也是一种非常独立的程序，因为它们之间不能相互通信；它们之间唯一的沟通只有通过输入和输出。</p>
+<p>着色器是使用一种叫GLSL的类C语言写成的。GLSL是为图形计算量身定制的，它包含一些针对向量和矩阵操作的有用特性。</p>
+<h3 id="顶点着色器"><a href="#顶点着色器" class="headerlink" title="顶点着色器"></a>顶点着色器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">#version 300 es //OpenGL ES 3.0</span><br><span class="line"></span><br><span class="line">//接受的输入变量</span><br><span class="line">layout(location = 0) in vec3 position;</span><br><span class="line">layout(location = 1) in vec3 color;</span><br><span class="line"></span><br><span class="line">//输出变量</span><br><span class="line">out vec3 outColor;</span><br><span class="line"></span><br><span class="line">//相当于C语言的main函数</span><br><span class="line">void main()</span><br><span class="line">&#123;   </span><br><span class="line">    //绘制图形</span><br><span class="line">    gl_Position = vec4(position[0],position[1],position[2], 1.0);</span><br><span class="line">    </span><br><span class="line">    outColor = color;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>图形渲染管线的第一个部分是顶点着色器(Vertex Shader)，它把一个单独的顶点作为输入.一个顶点(Vertex)是一个3D坐标的数据的集合。而顶点数据是用顶点属性(Vertex Attribute)表示的，它可以包含任何我们想用的数据.</p>
+<h3 id="片段着色器"><a href="#片段着色器" class="headerlink" title="片段着色器"></a>片段着色器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#version 300 es</span><br><span class="line"></span><br><span class="line">precision mediump float;    //表示 数据精确度 这里设置的为中级</span><br><span class="line"></span><br><span class="line">in vec3 outColor;</span><br><span class="line"></span><br><span class="line">out vec4 FragColor; //输出的色彩</span><br><span class="line"></span><br><span class="line">void main()</span><br><span class="line">&#123;</span><br><span class="line">    FragColor = vec4(outColor.x,outColor.y,outColor.z, 1.0);;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>片段着色器的主要目的是计算一个像素的最终颜色，这也是所有OpenGL高级效果产生的地方。通常，片段着色器包含3D场景的数据（比如光照、阴影、光的颜色等等），这些数据可以被用来计算<strong>最终像素的颜色</strong>。</p>
+<p>在所有对应颜色值确定以后，最终的对象将会被传到最后一个阶段，我们叫做<strong>Alpha测试</strong>和<strong>混合(Blending)阶段</strong>。这个阶段检测片段的对应的深度（和模板(Stencil)）值，用它们来判断这个像素是其它物体的前面还是后面，决定是否应该丢弃。这个阶段也会检查alpha值（alpha值定义了一个物体的透明度）并对物体进行混合(Blend)。所以，即使在片段着色器中计算出来了一个像素输出的颜色，在渲染多个三角形的时候最后的像素颜色也可能完全不同。</p>
+<h2 id="创建着色器对象"><a href="#创建着色器对象" class="headerlink" title="创建着色器对象"></a>创建着色器对象</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">static GLuint createGLShader(const char *shaderText, GLenum shaderType)</span><br><span class="line">&#123;</span><br><span class="line">    //创建着色器,将根据传入的type参数 创建一个新的 顶点或片段着色器,返回值为新的着色器对象句柄</span><br><span class="line">    //GL_VERTEX_SHADER(顶点着色器)     GL_FRAGMENT_SHADER(片段着色器)</span><br><span class="line">    GLuint shader = glCreateShader(shaderType);</span><br><span class="line"></span><br><span class="line">    //为着色器对象 提供着色器源代码.</span><br><span class="line">    //参数: shader --&gt; 着色器对象句柄</span><br><span class="line">    //      count --&gt; 着色器源字符串数量</span><br><span class="line">    //      string --&gt; 字符串的数组指针</span><br><span class="line">    //      length ---&gt; 指向保存美工着色器字符串大小且元素数量为count的整数数组指针.如果length为NULL 着色器字符串将被认定为空.</span><br><span class="line">    glShaderSource(shader, 1, &amp;shaderText, NULL);</span><br><span class="line"></span><br><span class="line">    //调用该方法,将指定的着色器源代码 进行编译</span><br><span class="line">    //参数shader 为着色器句柄</span><br><span class="line">    glCompileShader(shader);</span><br><span class="line"></span><br><span class="line">    //调用该方法获取 着色器源代码编译是否成功,并获取其他相关信息</span><br><span class="line">    //第二个参数 pname 表示要查询什么信息</span><br><span class="line">    /*</span><br><span class="line">     GL_COMPILE_STATUS ---&gt; 是否编译成功 成功返回 GL_TRUE</span><br><span class="line">     GL_INFO_LOG_LENGTH ---&gt; 查询源码编译后长度</span><br><span class="line">     GL_SHADER_SOURCE_LENGTH ---&gt; 查询源码长度</span><br><span class="line">     GL_SHADER_TYPE ---&gt; 查询着色器类型()</span><br><span class="line">     GL_DELETE_STATUS ---&gt; 着色器是否被标记删除</span><br><span class="line">     */</span><br><span class="line">    int compiled = 0;</span><br><span class="line">    glGetShaderiv(shader, GL_COMPILE_STATUS, &amp;compiled);</span><br><span class="line">    if (!compiled) &#123;</span><br><span class="line">        GLint infoLen = 0;</span><br><span class="line">        glGetShaderiv (shader, GL_INFO_LOG_LENGTH, &amp;infoLen);</span><br><span class="line">        if (infoLen &gt; 1) &#123;</span><br><span class="line">            char *infoLog = (char *)malloc(sizeof(char) * infoLen);</span><br><span class="line">            if (infoLog) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                //检索信息日志</span><br><span class="line">                //参数: shader 着色器对象句柄</span><br><span class="line">                //      maxLength 保存信息日志的缓冲区大小</span><br><span class="line">                //      length 写入信息日志长度 ,不需要知道可传NULL</span><br><span class="line">                //      infoLog 保存日志信息的指针</span><br><span class="line">                glGetShaderInfoLog (shader, infoLen, NULL, infoLog);</span><br><span class="line">                GLlog(&quot;Error compiling shader: %s\n&quot;, infoLog);</span><br><span class="line">                free(infoLog);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        //删除着色器对象, 参数shader为要删除的着色器对象的句柄</span><br><span class="line">        //若一个着色器链接到一个程序对象,那么该方法不会立刻删除着色器,而是将着色器标记为删除,当着色器不在连接到任何程序对象时,它的内存将被释放.</span><br><span class="line">        glDeleteShader(shader);</span><br><span class="line">        return 0;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    return shader;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="创建程序对象"><a href="#创建程序对象" class="headerlink" title="创建程序对象"></a>创建程序对象</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">// 创建一个程序对象,返回程序对象的句柄</span><br><span class="line">   GLuint program = glCreateProgram();</span><br><span class="line"></span><br><span class="line">   // 得到需要的着色器</span><br><span class="line">   GLuint vertShader = createGLShader(vertext, GL_VERTEX_SHADER);  //顶点着色器</span><br><span class="line">   GLuint fragShader = createGLShader(frag, GL_FRAGMENT_SHADER);   //片元着色器</span><br><span class="line">   </span><br><span class="line">   if (vertShader == 0 || fragShader == 0) &#123;</span><br><span class="line">       return 0;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   //将程序对象和 着色器对象链接  //在ES 3.0中,每个程序对象 必须连接一个顶点着色器和片段着色器</span><br><span class="line">   //program程序对象句柄 shader着色器句柄</span><br><span class="line">   glAttachShader(program, vertShader);</span><br><span class="line">   glAttachShader(program, fragShader);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   //链接程序对象 生成可执行程序(在着色器已完成编译 且程序对象连接了着色器)</span><br><span class="line">   //链接程序会检查各种对象的数量,和各种条件.</span><br><span class="line">   //在链接阶段就是生成最终硬件指令的时候(和C语言一样)</span><br><span class="line">   glLinkProgram(program);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   //检查链接是否成功</span><br><span class="line">   GLint success;</span><br><span class="line">   glGetProgramiv(program, GL_LINK_STATUS, &amp;success);</span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line">   if (!success) &#123;</span><br><span class="line">       GLint infoLen;</span><br><span class="line">       //使用 GL_INFO_LOG_LENGTH 表示获取信息日志</span><br><span class="line">       glGetProgramiv(program, GL_INFO_LOG_LENGTH, &amp;infoLen);</span><br><span class="line">       if (infoLen &gt; 1) &#123;</span><br><span class="line">           GLchar *infoText = (GLchar *)malloc(sizeof(GLchar)*infoLen + 1);</span><br><span class="line">           if (infoText) &#123;</span><br><span class="line">               memset(infoText, 0x00, sizeof(GLchar)*infoLen + 1);</span><br><span class="line"></span><br><span class="line">               // 从信息日志中获取信息</span><br><span class="line">               glGetProgramInfoLog(program, infoLen, NULL, infoText);</span><br><span class="line">               GLlog(&quot;%s&quot;, infoText);</span><br><span class="line">               free(infoText);</span><br><span class="line"></span><br><span class="line">               //此函数用于校验当前的程序对象,校验结果可通过 glGetProgramiv函数检查,此函数只用于调试,因为他很慢.</span><br><span class="line">               //glValidateProgram(program);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       glDeleteShader(vertShader);</span><br><span class="line">       glDeleteShader(fragShader);</span><br><span class="line"></span><br><span class="line">       //删除程序对象</span><br><span class="line">       glDeleteProgram(program);</span><br><span class="line">       return 0;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   /*</span><br><span class="line">* 链接完着色器,生成可执行程序. 将着色器断开删除</span><br><span class="line">*/</span><br><span class="line">   //断开指定程序对象和片段着色器</span><br><span class="line">   glDetachShader(program, vertShader);</span><br><span class="line">   glDetachShader(program, fragShader);</span><br><span class="line"></span><br><span class="line">   //将着色器标记为删除</span><br><span class="line">   glDeleteShader(vertShader);</span><br><span class="line">   glDeleteShader(fragShader);</span><br></pre></td></tr></table></figure>
+<p>程序对象就是一个容器对象,将着色器与之连接,最后链接生成最终的可执行程序.</p>
+<h2 id="输入顶点数据"><a href="#输入顶点数据" class="headerlink" title="输入顶点数据"></a>输入顶点数据</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">//三角形的三点坐标+颜色坐标</span><br><span class="line">static GLfloat vertices[] = &#123;</span><br><span class="line">    //点坐标                     //颜色</span><br><span class="line">    0.5f,  0.5f, 0.0f,          1.0f, 0.0f, 0.0f,</span><br><span class="line">    0.5f, -0.5f, 0.0f,          0.0f, 1.0f, 0.0f,</span><br><span class="line">    -0.5f, -0.5f, 0.0f,         0.0f, 0.0f, 1.0f,</span><br><span class="line">    -0.5f, 0.5f, 0.0f,          1.0f, 0.0f, 1.0f</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">static unsigned int indices[] = &#123;</span><br><span class="line">    0,1,3,</span><br><span class="line">    1,2,3</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">unsigned int VAO,VBO,EBO;</span><br><span class="line">//创建VAO对象,VBO对象,EBO对象</span><br><span class="line">glGenVertexArrays(1, &amp;VAO);</span><br><span class="line">glGenBuffers(1, &amp;VBO);</span><br><span class="line">glGenBuffers(1, &amp;EBO);</span><br><span class="line"></span><br><span class="line">//绑定VAO VBO EBO</span><br><span class="line">glBindVertexArray(VAO);</span><br><span class="line">glBindBuffer(GL_ARRAY_BUFFER, VBO);</span><br><span class="line">glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);</span><br><span class="line"></span><br><span class="line">将顶点数据 和 索引数据 复制到缓冲区中</span><br><span class="line">glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);</span><br><span class="line">glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);</span><br><span class="line"></span><br><span class="line">//设置顶点属性指针 输入数据</span><br><span class="line">glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);</span><br><span class="line">//激活 0号变量,为了性能,若不激活着色器无法接受数据</span><br><span class="line">glEnableVertexAttribArray(0);</span><br><span class="line"></span><br><span class="line">glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));</span><br><span class="line">glEnableVertexAttribArray(1);</span><br><span class="line">glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));</span><br><span class="line">glEnableVertexAttribArray(1);</span><br></pre></td></tr></table></figure>
+<h3 id="VAO-VBO-EBO"><a href="#VAO-VBO-EBO" class="headerlink" title="VAO VBO EBO"></a>VAO VBO EBO</h3><p>不使用VAO VBO绘制代码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">static GLfloat vertices[] = &#123;</span><br><span class="line">    0.0f,  0.5f, 0.0f,</span><br><span class="line">    -0.5f, -0.5f, 0.0f,</span><br><span class="line">    0.5f, -0.5f, 0.0f</span><br><span class="line">&#125;;</span><br><span class="line">GLint posSlot = glGetAttribLocation(_program, &quot;position&quot;);</span><br><span class="line">glVertexAttribPointer(posSlot, 3, GL_FLOAT, GL_FALSE, 0, vertices);</span><br><span class="line">glEnableVertexAttribArray(posSlot);</span><br><span class="line"></span><br><span class="line">static GLfloat colors[] = &#123;</span><br><span class="line">    0.0f, 1.0f, 1.0f,</span><br><span class="line">    1.0f, 0.0f, 1.0f,</span><br><span class="line">    1.0f, 1.0f, 0.0f</span><br><span class="line">&#125;;</span><br><span class="line">GLint colorSlot = glGetAttribLocation(_program, &quot;color&quot;);</span><br><span class="line">glVertexAttribPointer(colorSlot, 3, GL_FLOAT, GL_FALSE, 0, colors);</span><br><span class="line">glEnableVertexAttribArray(colorSlot);</span><br></pre></td></tr></table></figure>
+<h4 id="VBO"><a href="#VBO" class="headerlink" title="VBO"></a>VBO</h4><p>如上面的例子所示, 普通的顶点数组的传输，需要在绘制的时候频繁地从CPU到GPU传输顶点数据，这种做法效率低下.<br>为了加快显示速度，显卡增加了一个扩展 <strong>VBO</strong> (Vertex Buffer object)，即<strong>顶点缓存</strong>。它直接在 <strong>GPU 中开辟一个缓存区</strong>域来存储顶点数据，因为它是用来缓存储顶点数据，因此被称之为顶点缓存。使用顶点缓存能够大大较少了CPU到GPU 之间的数据拷贝开销，因此显著地提升了程序运行的效率。</p>
+<h5 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h5><p>1, 创建顶点缓存对象<br><code>void glGenBuffers (GLsizei n, GLuint* buffers);</code></p>
+<blockquote>
+<p>参数 n ： 表示需要创建顶点缓存对象的个数<br>参数 buffers ：用于存储创建好的顶点缓存对象句柄</p>
+</blockquote>
+<p>2, 将顶点缓存对象设置为当前数组缓存对象<br><code>void glBindBuffer (GLenum target, GLuint buffer);</code></p>
+<blockquote>
+<p>target ：指定绑定的目标，取值为 GL_ARRAY_BUFFER（用于顶点数据） 或 GL_ELEMENT_ARRAY_BUFFER（用于索引数据）<br>buffer ：顶点缓存对象句柄</p>
+</blockquote>
+<p>3, 为顶点缓存对象分配空间(这里就是将数据一次性 拷贝至显存中)<br><code>void glBufferData (GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage);</code></p>
+<blockquote>
+<p>target：指定绑定的目标，取值为 GL_ARRAY_BUFFER（用于顶点数据） 或 GL_ELEMENT_ARRAY_BUFFER（用于索引数据）.<br>size ：指定顶点缓存区的大小，以字节为单位计数；<br>data ：用于初始化顶点缓存区的数据，可以为 NULL，表示只分配空间，之后再由 glBufferSubData 进行初始化；<br>usage ：表示该缓存区域将会被如何使用，它的主要目的是用于对该缓存区域做何种程度的优化，比如经常修改的数据可能就会放在GPU缓存中达到快速操作的目的.</p>
+</blockquote>
+<p>usage:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GL_STATIC_DRAW 	表示该缓存区不会被修改</span><br><span class="line">GL_DYNAMIC_DRAW 	表示该缓存区会被周期性更改</span><br><span class="line">GL_STREAM_DRAW 	表示该缓存区会被频繁更改</span><br></pre></td></tr></table></figure></p>
+<p>4,更新顶点缓冲区数据<br><code>void glBufferSubData (GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid* data);</code></p>
+<blockquote>
+<p>offset: 表示需要更新的数据的起始偏移量；<br>size: 表示需要更新的数据的个数，也是以字节为计数单位；<br>data: 用于更新的数据；</p>
+</blockquote>
+<p>5,释放顶点缓存<br><code>void glDeleteBuffers (GLsizei n, const GLuint* buffers);</code></p>
+<blockquote>
+<p>n ： 表示顶点缓存对象的个数<br>buffers ：顶点缓存对象句柄</p>
+</blockquote>
+<h4 id="VAO"><a href="#VAO" class="headerlink" title="VAO"></a>VAO</h4><p>VAO的全名是 Vertex Array Object。它不用作存储数据，但它与顶点绘制相关。<br>它的定位是<strong>状态对象</strong>，记录存储状态信息。VAO记录的是一次绘制中做需要的信息，这包括数据在哪里、数据格式是什么等信息。VAO其实可以看成一个容器，可以包括多个VBO。 由于它进一步将VBO容于其中，所以绘制效率将在VBO的基础上更进一步。目前OpenGL ES3.0及以上才支持顶点数组对象。</p>
+<p><img src="/images/OpenglES--绘制彩色矩形/15117525484339.jpg" alt="VBO和VAO关系"></p>
+<h5 id="函数-1"><a href="#函数-1" class="headerlink" title="函数"></a>函数</h5><p>1, 创建顶点数组对象<br><code>glGenVertexArrays (GLsizei n, GLuint* arrays) ;</code></p>
+<blockquote>
+<p>n ： 表示顶点数组对象的个数<br>arrays ：顶点数组对象句柄</p>
+</blockquote>
+<p>2, 将顶点数组对象设置为当前顶点数组对象<br><code>glBindVertexArray (GLuint array) ;</code></p>
+<blockquote>
+<p>arrays ：顶点数组对象句柄</p>
+</blockquote>
+<p>3,释放顶点数组对象<br><code>glDeleteVertexArrays (GLsizei n, const GLuint* arrays);</code></p>
+<blockquote>
+<p>n ： 表示顶点数组对象的个数<br>arrays ：顶点数组对象句柄</p>
+</blockquote>
+<h5 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h5><p>如代码中所写,在绑定VAO后,后续的VBO操作都会存储到当前绑定的VAO中.这样就将当前绘制状态记录下来了. 当下次还要绘制当前图形时, 只需再次绑定当前VAO, 进行后面的绘制操作即可.对于OpenGL ES2.0 使用VAO 则需要使用另外提供的API来实现.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GLvoid glGenVertexArraysOES(GLsizei n, GLuint *arrays)</span><br><span class="line">GLvoid glBindVertexArrayOES(GLuint array);</span><br><span class="line">GLvoid glDeleteVertexArraysOES(GLsizei n, const GLuint *arrays);; </span><br><span class="line">GLboolean glIsVertexArrayOES(GLuint array);</span><br></pre></td></tr></table></figure>
+<h4 id="EBO"><a href="#EBO" class="headerlink" title="EBO"></a>EBO</h4><p>索引缓冲对象(Element Buffer Object，EBO，也叫Index Buffer Object，IBO),当绘制现有图形时,存在顶点数据复用时,可以使用EBO. 但是这是需要斟酌的,因为在使用EBO时,在显存中 又存储的索引数据,有可能并不比原来性能更好~</p>
+<h5 id="函数-2"><a href="#函数-2" class="headerlink" title="函数"></a>函数</h5><p>1,创建EBO(和VBO类似)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">unsigned int EBO;</span><br><span class="line">glGenBuffers(1, &amp;EBO);</span><br></pre></td></tr></table></figure>
+<p>2,绑定EBO,将索引复制到缓冲里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);</span><br><span class="line">glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);</span><br></pre></td></tr></table></figure>
+<p>3, 使用<code>glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);</code>替代<code>glDrawArrays</code></p>
+<h3 id="函数补充"><a href="#函数补充" class="headerlink" title="函数补充"></a>函数补充</h3><p><code>glVertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr)</code></p>
+<p>该函数用于将顶点属性传入顶点着色器<br>参数:</p>
+<blockquote>
+<p>index: 对应顶你个点着色器中变量的location<br>size :表示该顶点属性对应的分量数量.也就是接收者为几位向量 如写入3 则表示为<code>vec3</code> 接收者为3维向量. 必须是 1~4.<br>type :表明每个分量的类型 可用的符号常量有<code>GL_BYTE</code>, <code>GL_UNSIGNED_BYTE</code>, <code>GL_SHORT</code>,<code>GL_UNSIGNED_SHORT</code>, <code>GL_FIXED</code>, 和 <code>GL_FLOAT</code>，初始值为<code>GL_FLOAT</code>；<br>normalized: 是否对每个分量进行归一化处理, 也就是若type为float类型.<br>stride:指定连续顶点属性之间的偏移量,如果设置0,则表示各个分量是紧密排在一起,中间没有其他多余数据.<br>ptr 顶点数据指针</p>
+</blockquote>
+<p>此函数在有无VBO的情况下,使用有所差异~,在不适用VBO时,ptr确实是顶点数据指针.<br>当使用VBO时,顶点数据都已经拷贝至显存中,这里的ptr 就表示为缓冲区数据的便宜量了.</p>
+<p>无EBO:<br><code>glVertexAttribPointer(colorSlot, 3, GL_FLOAT, GL_FALSE, 0, colors);</code></p>
+<p>有EBO:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">static GLfloat vertices[] = &#123;</span><br><span class="line">            //点坐标                     //颜色</span><br><span class="line">            0.5f,  0.5f, 0.0f,          1.0f, 0.0f, 0.0f,</span><br><span class="line">            0.5f, -0.5f, 0.0f,          0.0f, 1.0f, 0.0f,</span><br><span class="line">            -0.5f, -0.5f, 0.0f,         0.0f, 0.0f, 1.0f,</span><br><span class="line">            -0.5f, 0.5f, 0.0f,          1.0f, 0.0f, 1.0f</span><br><span class="line">        &#125;;</span><br><span class="line">.......(VBO与其他代码).......</span><br><span class="line"></span><br><span class="line">glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);</span><br><span class="line">glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));</span><br></pre></td></tr></table></figure>
+<p>在这里0号属性和1号属性紧密相连,且0号和1号的分量数都为3,以0号属性开头.<br>故: 第一个0号和第二个0号 中间有6个间距 stride = 6<em>sizeof(float).<br>1号在0号后面, 0号ptr为 `(void</em>)0<code>. 1号ptr为</code>(void<em> )(3</em>sizeof(float))`</p>
+<h2 id="绘制"><a href="#绘制" class="headerlink" title="绘制"></a>绘制</h2><h3 id="使用-EBO"><a href="#使用-EBO" class="headerlink" title="使用 EBO:"></a>使用 EBO:</h3><p><code>glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0);</code><br>参数:<br> model:指定呈现那种图元(将这些点绘制成怎样的形状). 可选项:</p>
+<blockquote>
+<p>GL_POINTS(点),<br>GL_LINE_STRIP(多端线),<br>GL_LINE_LOOP(线圈),<br>GL_LINES(线段),<br>GL_TRIANGLE_FAN, (三角形扇)<br>GL_TRIANGLES, (三角形)<br>count: 传入顶点数据的数量<br>type: 索引数组的元素属性 <code>GL_UNSIGNED_BYTE</code>, <code>GL_UNSIGNED_SHORT</code>, or <code>GL_UNSIGNED_INT</code>.<br>indices: 指向索引数组的指针, 当使用VBO时,则表示为偏移量,若为紧密相连时则传入0.</p>
+</blockquote>
+<h3 id="不使用EBO"><a href="#不使用EBO" class="headerlink" title="不使用EBO"></a>不使用EBO</h3><p><code>glDrawArrays(GL_TRIANGLES, 0, 3);</code><br>参数: model 和上面那个含义一样.<br>     first 表示顶点数据起始索引, 从头开始则为0.<br>     count 表示要传入顶点数据的数量.</p>
+<h3 id="最后显示"><a href="#最后显示" class="headerlink" title="最后显示"></a>最后显示</h3><p><code>[_context presentRenderbuffer:GL_RENDERBUFFER];</code></p>
+<h1 id="学习参考"><a href="#学习参考" class="headerlink" title="学习参考"></a>学习参考</h1><p><a href="https://learnopengl-cn.github.io/01%20Getting%20started/04%20Hello%20Triangle/" target="_blank" rel="external">你好三角形</a><br><a href="http://www.jianshu.com/c/30e2e76bc140" target="_blank" rel="external">OpenGL 简书专题</a></p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+            <li class="next">
+                <a href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" title= Opengl ES 3.0 on iOS -- EAGLContext >
+                    <span>Next Post</span>
+                    <span>Opengl ES 3.0 on iOS -- EAGLContext</span>
+                </a>
+            </li>
+        
+        
+            <li class="previous">
+                <a href= "/2017/11/23/YYAsyncLayer 学习/" title= YYAsyncLayer 学习 >
+                    <span>Previous Post</span>
+                    <span>YYAsyncLayer 学习</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#实现"><span class="toc-number">2.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#配置图层"><span class="toc-number">2.1.</span> <span class="toc-text">配置图层</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置上下文"><span class="toc-number">2.2.</span> <span class="toc-text">配置上下文</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#设置缓冲区-渲染缓冲和帧缓冲"><span class="toc-number">2.3.</span> <span class="toc-text">设置缓冲区(渲染缓冲和帧缓冲)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#函数解释"><span class="toc-number">2.3.1.</span> <span class="toc-text">函数解释</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#准备着色器源码"><span class="toc-number">2.4.</span> <span class="toc-text">准备着色器源码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#顶点着色器"><span class="toc-number">2.4.1.</span> <span class="toc-text">顶点着色器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#片段着色器"><span class="toc-number">2.4.2.</span> <span class="toc-text">片段着色器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建着色器对象"><span class="toc-number">2.5.</span> <span class="toc-text">创建着色器对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建程序对象"><span class="toc-number">2.6.</span> <span class="toc-text">创建程序对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#输入顶点数据"><span class="toc-number">2.7.</span> <span class="toc-text">输入顶点数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#VAO-VBO-EBO"><span class="toc-number">2.7.1.</span> <span class="toc-text">VAO VBO EBO</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#VBO"><span class="toc-number">2.7.1.1.</span> <span class="toc-text">VBO</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#函数"><span class="toc-number">2.7.1.1.1.</span> <span class="toc-text">函数</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#VAO"><span class="toc-number">2.7.1.2.</span> <span class="toc-text">VAO</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#函数-1"><span class="toc-number">2.7.1.2.1.</span> <span class="toc-text">函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#使用"><span class="toc-number">2.7.1.2.2.</span> <span class="toc-text">使用</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EBO"><span class="toc-number">2.7.1.3.</span> <span class="toc-text">EBO</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#函数-2"><span class="toc-number">2.7.1.3.1.</span> <span class="toc-text">函数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#函数补充"><span class="toc-number">2.7.2.</span> <span class="toc-text">函数补充</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#绘制"><span class="toc-number">2.8.</span> <span class="toc-text">绘制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-EBO"><span class="toc-number">2.8.1.</span> <span class="toc-text">使用 EBO:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#不使用EBO"><span class="toc-number">2.8.2.</span> <span class="toc-text">不使用EBO</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#最后显示"><span class="toc-number">2.8.3.</span> <span class="toc-text">最后显示</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#学习参考"><span class="toc-number">3.</span> <span class="toc-text">学习参考</span></a></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+

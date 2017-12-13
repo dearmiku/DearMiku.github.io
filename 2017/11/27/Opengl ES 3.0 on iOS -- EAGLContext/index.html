@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        Opengl ES 3.0 on iOS -- EAGLContext · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">Opengl ES 3.0 on iOS -- EAGLContext</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            Opengl ES 3.0 on iOS -- EAGLContext
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/11/27</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>EAGLContext对象是管理OpenGL ES渲染上下文,若想使用OpenGL ES 进行绘制工作,则必须一个上下文对象.</p>
+<h1 id="API"><a href="#API" class="headerlink" title="API"></a>API</h1><h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- (nullable instancetype) initWithAPI:(EAGLRenderingAPI) api;</span><br><span class="line">- (nullable instancetype) initWithAPI:(EAGLRenderingAPI) api sharegroup:(EAGLSharegroup*) sharegroup NS_DESIGNATED_INITIALIZER;</span><br></pre></td></tr></table></figure>
+<p>参数:</p>
+<blockquote>
+<p>api 表示将要使用的OpenGL ES 版本. <code>kEAGLRenderingAPIOpenGLES3</code> 表示使用3.0</p>
+<p>sharegroup 对象管理与一个或多个EAGLContext对象关联的OpenGL ES资源,若不指定或值为NULL则创建新的对象,当资源需要被共享时再使用它.</p>
+</blockquote>
+<h2 id="绑定上下文"><a href="#绑定上下文" class="headerlink" title="绑定上下文"></a>绑定上下文</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+ (BOOL)setCurrentContext:(nullable EAGLContext*) context;</span><br></pre></td></tr></table></figure>
+<p>绑定一个<strong>全局</strong>的上下文对象. 注意: 1, 需要手动对该对象强引用,否则将会被释放. 2, 该对象线程不安全, 使用时应防止同时从多个线程访问同一个上下文对象</p>
+<h2 id="分配渲染缓冲区"><a href="#分配渲染缓冲区" class="headerlink" title="分配渲染缓冲区"></a>分配渲染缓冲区</h2><p><code>- (BOOL)renderbufferStorage:(NSUInteger)target fromDrawable:(nullable id&lt;EAGLDrawable&gt;)drawable;</code><br>通过调用此方法为缓冲区分配共享的存储空间, 此方法是替代 原<code>glRenderbufferStorage</code>方法的.<br>参数:</p>
+<blockquote>
+<p>target :当前绑定的渲染缓冲区的OpenGL ES绑定点。 此参数的值必须是<strong>GL_RENDERBUFFER</strong>（或OpenGL ES 1.1上下文中的GL_RENDERBUFFER_OES）</p>
+<p>drawable :管理渲染缓冲区的数据存储的对象。 在iOS中，此参数的值必须是<strong>CAEAGLLayer</strong>对象</p>
+</blockquote>
+<h2 id="显示缓冲区内容"><a href="#显示缓冲区内容" class="headerlink" title="显示缓冲区内容"></a>显示缓冲区内容</h2><p><code>- (BOOL)presentRenderbuffer:(NSUInteger)target;</code><br>将渲染缓冲区的内容展示在屏幕上.<br>参数: </p>
+<blockquote>
+<p>target : 当前绑定的渲染缓冲区的OpenGL ES绑定点。 此参数的值必须是<strong>GL_RENDERBUFFER</strong>（或OpenGL ES 1.1上下文中的GL_RENDERBUFFER_OES）。</p>
+</blockquote>
+<p>在典型的显示系统中,物理屏幕以固定的速率从帧缓冲区内存中更新,若我们直接绘制带帧缓冲区,那么用户在部分更新帧缓冲区时会看到伪像. 在OpenGL中采用双缓冲区, 分为 前缓冲区 和 后缓冲区.</p>
+<p>所有的渲染都发生在后台缓冲区,它位于不可见于屏幕的内存区域,当所有渲染完成时,这个渲染将被 交换 到前台缓冲区用于显示, 然后原 前台缓冲区就下一帧的后台缓冲区</p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+            <li class="next">
+                <a href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" title= Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO) >
+                    <span>Next Post</span>
+                    <span>Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</span>
+                </a>
+            </li>
+        
+        
+            <li class="previous">
+                <a href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" title= Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形) >
+                    <span>Previous Post</span>
+                    <span>Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#API"><span class="toc-number">2.</span> <span class="toc-text">API</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#初始化"><span class="toc-number">2.1.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#绑定上下文"><span class="toc-number">2.2.</span> <span class="toc-text">绑定上下文</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分配渲染缓冲区"><span class="toc-number">2.3.</span> <span class="toc-text">分配渲染缓冲区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#显示缓冲区内容"><span class="toc-number">2.4.</span> <span class="toc-text">显示缓冲区内容</span></a></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+

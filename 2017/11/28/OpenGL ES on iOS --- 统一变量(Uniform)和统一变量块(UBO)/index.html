@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO) · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/11/28</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Uniform是一种从CPU中的应用向GPU中的着色器发送数据的方式，但uniform和顶点属性有些不同。</p>
+<blockquote>
+<p>首先，uniform是<strong>全局</strong>的(Global)。全局意味着uniform变量必须在每个着色器程序对象中都是独一无二的，而且它可以被着色器程序的任意着色器在任意阶段访问。<br>第二，无论你把uniform值设置成什么，uniform会一直保存它们的数据，直到它们被重置或更新。</p>
+</blockquote>
+<h1 id="单独统一变量"><a href="#单独统一变量" class="headerlink" title="单独统一变量"></a>单独统一变量</h1><h2 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h2><p><code>uniform vec3 color</code></p>
+<h2 id="赋值"><a href="#赋值" class="headerlink" title="赋值"></a>赋值</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">//获取指定统一变量的location</span><br><span class="line">int vertexColorLocation = glGetUniformLocation(_program, &quot;test&quot;);</span><br><span class="line"></span><br><span class="line">//为vec3 的统一变量 赋值</span><br><span class="line">glUniform3f(vertexColorLocation, 0.0f, 1.0f, 0.0f);</span><br></pre></td></tr></table></figure>
+<p>赋值函数是根据 统一变量类型的不同而调整的.其中函数名中包含数字（1、2、3、4）表示接受这个数字个用于更改uniform变量的值，i表示32位整形，f表示32位浮点型，ub表示8位无符号byte，ui表示32位无符号整形，v表示接受相应的指针类型(或者就是传入的是数组)。</p>
+<blockquote>
+<p><code>glUniform1f(GLint locaation,GLFloat x)</code> 表示 float类型<br><code>glUniform2f(GLint locaation,GLFloat x,GLFloat y)</code> 表示 二位向量 分量类型为float<br><code>glUniform1fv(GLint locaation,GLSize count,const GLfloat* value)</code> float类型指针<br><code>glUniformMatrix4x3(Glint location,GLsizei count,GLboolean transpose,const GLfloat* value)</code> 表示为 4x3矩阵. 参数: transpose 表示是否采用 行优先顺序(GL_TRUE)</p>
+</blockquote>
+<h1 id="UBO"><a href="#UBO" class="headerlink" title="UBO"></a>UBO</h1><p>UBO(Uniform Buffer Object)是用来存储着色语言中Uniform类型变量的<strong>缓冲区对象</strong>，使用UBO可以让uniform变量在不同的着色语言程序中实现共用，也可以在着色语言程序中实现uniform类型变量的设置与更新。</p>
+<p>提到UBO就必须要提到着色语言GLSL中的Uniform Blocks，它将众多的Uniform类型的变量集中在一起进行统一的管理，对于需要大量Uniform类型变量的程序可以显著地提高性能。(有点像全局版的VBO)</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p><img src="/images/OpenGL ES on iOS --UBO/15118303676115.jpg" alt="UBO示意图"></p>
+<p>在显存中创建缓存对象(Buffer),在buffer中存储统一变量数据, 将Buffer与 指定的point绑定, 将统一变量缓冲区的索引 和 point绑定. 这样通过point 将变量 和 缓存 连接.</p>
+<h2 id="设置UBO"><a href="#设置UBO" class="headerlink" title="设置UBO"></a>设置UBO</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//统一变量块</span><br><span class="line">layout (std140) uniform colorBlock&#123;</span><br><span class="line">    vec4 cc;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">GLuint blockid,bufferid;</span><br><span class="line">GLint blocksize;</span><br><span class="line">GLint point = 1;</span><br><span class="line"></span><br><span class="line">// 统一变量数据</span><br><span class="line">GLfloat blockData[] = &#123;</span><br><span class="line">    1.0f,1.0f,1.0f,1.0f</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//获取统一变量块索引</span><br><span class="line">blockid = glGetUniformBlockIndex(_program, &quot;colorBlock&quot;);</span><br><span class="line"></span><br><span class="line">//获取统一变量块大小</span><br><span class="line">glGetActiveUniformBlockiv(_program, blockid, GL_UNIFORM_BLOCK_DATA_SIZE, &amp;blocksize);</span><br><span class="line"></span><br><span class="line">//将变量索引 和 point 绑定</span><br><span class="line">glUniformBlockBinding(_program, blockid, point);</span><br><span class="line"></span><br><span class="line">//创建与绑定缓冲区</span><br><span class="line">glGenBuffers(1, &amp;bufferid);</span><br><span class="line">glBindBuffer(GL_UNIFORM_BUFFER, bufferid);</span><br><span class="line"></span><br><span class="line">//向缓冲区中赋值</span><br><span class="line">glBufferData(GL_UNIFORM_BUFFER, blocksize, blockData, GL_DYNAMIC_DRAW);</span><br><span class="line"></span><br><span class="line">//将UBO 和 point 绑定</span><br><span class="line">glBindBufferBase(GL_UNIFORM_BUFFER, point, bufferid);</span><br></pre></td></tr></table></figure>
+<h2 id="修改UBO"><a href="#修改UBO" class="headerlink" title="修改UBO"></a>修改UBO</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">GLfloat uploadData[] = &#123;</span><br><span class="line">    0.0f,0.0f,1.0f,1.0f</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 绑定当然统一变量块的 buffer</span><br><span class="line">glBindBuffer(GL_UNIFORM_BUFFER, bufferid);</span><br><span class="line"></span><br><span class="line">//获取统一变量块 中 指定变量的 偏移量</span><br><span class="line">const GLchar *names[] = &#123;&quot;cc&quot;&#125;;</span><br><span class="line">GLuint indices[1];</span><br><span class="line">glGetUniformIndices(_program, 1, names, indices);</span><br><span class="line">GLint offset[1];</span><br><span class="line">glGetActiveUniformsiv(_program, 1, indices, GL_UNIFORM_OFFSET, offset);</span><br><span class="line">glBufferSubData(GL_UNIFORM_BUFFER, offset[0], blocksize, uploadData);</span><br></pre></td></tr></table></figure>
+<h3 id="函数补充"><a href="#函数补充" class="headerlink" title="函数补充"></a>函数补充</h3><p>1, <code>glGetUniformIndices (GLuint program, GLsizei uniformCount, const GLchar* const *uniformNames, GLuint* uniformIndices)</code><br>该函数用于获取统一变量块中 变量们的索引 参数:</p>
+<blockquote>
+<p>program 程序对象<br>uniformCount 变量名称数组的元素数量<br>uniformNames 变量名称数组<br>uniformIndices 用于接受变量索引的数组</p>
+</blockquote>
+<p>2,<code>glGetActiveUniformsiv (GLuint program, GLsizei uniformCount, const GLuint* uniformIndices, GLenum pname, GLint* params)</code><br>该函数用于 通过变量索引 查询变量信息. 参数:</p>
+<blockquote>
+<p>program 程序对象<br>uniformCount 变量数量<br>uniformIndices 变量索引数组<br>pname 表示要查询变量的那个属性 GL_UNIFORM_OFFSET(变量偏移量)  GL_UNIFORM_SIZE(变量大小) GL_UNIFORM_NAME_LENGTH(变量名长度) GL_UNIFORM_TYPE(变量类型)….<br>params 接受查询结果的数组</p>
+</blockquote>
+<h1 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h1><h2 id="着色语言编译优化"><a href="#着色语言编译优化" class="headerlink" title="着色语言编译优化"></a>着色语言编译优化</h2><p>如果你声明了一个uniform却在GLSL代码中没用过，编译器会静默移除这个变量，导致最后编译出的版本中并不会包含它.</p>
+<h2 id="UBO限定符"><a href="#UBO限定符" class="headerlink" title="UBO限定符"></a>UBO限定符</h2><p>在UBO中,针对不同的限定符 还存在不同的字节补齐的情况.所以获取偏移量,大小最好还是通过查询进行,避免自己计算出现错误.</p>
+<p>这是 std140(标准统一变量块布局)限定符的内存分配情况:</p>
+<p><img src="/images/OpenGL ES on iOS --UBO/screenshot.png" alt="std140"></p>
+<p>其他的限定符 在我学了之后会补上~</p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+            <li class="next">
+                <a href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" title= OpenGL ES on iOS --- 2D纹理 >
+                    <span>Next Post</span>
+                    <span>OpenGL ES on iOS --- 2D纹理</span>
+                </a>
+            </li>
+        
+        
+            <li class="previous">
+                <a href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" title= Opengl ES 3.0 on iOS -- EAGLContext >
+                    <span>Previous Post</span>
+                    <span>Opengl ES 3.0 on iOS -- EAGLContext</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#单独统一变量"><span class="toc-number">2.</span> <span class="toc-text">单独统一变量</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#声明"><span class="toc-number">2.1.</span> <span class="toc-text">声明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#赋值"><span class="toc-number">2.2.</span> <span class="toc-text">赋值</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#UBO"><span class="toc-number">3.</span> <span class="toc-text">UBO</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#原理"><span class="toc-number">3.1.</span> <span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#设置UBO"><span class="toc-number">3.2.</span> <span class="toc-text">设置UBO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改UBO"><span class="toc-number">3.3.</span> <span class="toc-text">修改UBO</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#函数补充"><span class="toc-number">3.3.1.</span> <span class="toc-text">函数补充</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#注意"><span class="toc-number">4.</span> <span class="toc-text">注意</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#着色语言编译优化"><span class="toc-number">4.1.</span> <span class="toc-text">着色语言编译优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UBO限定符"><span class="toc-number">4.2.</span> <span class="toc-text">UBO限定符</span></a></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+

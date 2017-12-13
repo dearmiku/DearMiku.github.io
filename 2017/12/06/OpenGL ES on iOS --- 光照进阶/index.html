@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        OpenGL ES on iOS --- 光照进阶 · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">OpenGL ES on iOS --- 光照进阶</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            OpenGL ES on iOS --- 光照进阶
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/12/06</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h1><p>本文记录我记录我学习 坐标体系和矩阵转换的过程,加深学习便于后续查询,可能有些描述不够准确,或者内容不够充实,还请多多指正,共同学习.</p>
+<h1 id="光源分类"><a href="#光源分类" class="headerlink" title="光源分类"></a>光源分类</h1><p>在基础光照时,学习了光照对物体的作用,也就相当于物体的材质,这次主要说 现实生活中的光源</p>
+<h2 id="平行光"><a href="#平行光" class="headerlink" title="平行光"></a>平行光</h2><p>当光源无限远时,从其发射过来的的光可以近似的看做平行光(例如太阳);这时 光线的方向都是一致的.<br><img src="/images/OpenGL ES on iOS --- 光照进阶/15125210847433.jpg" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">float ambientStrength = 0.3;    //环境因子</span><br><span class="line">   float specularStrength = 2.0;</span><br><span class="line">   float reflectance = 256.0;</span><br><span class="line"></span><br><span class="line">   //平行光方向</span><br><span class="line">   vec3 paraLightDir = normalize(vec3(-0.2,-1.0,-0.3));</span><br><span class="line"></span><br><span class="line">   //环境光</span><br><span class="line">   vec3 ambient = ambientStrength * texture(Texture,outTexCoord).rgb;</span><br><span class="line"></span><br><span class="line">   //漫反射</span><br><span class="line">   vec3 norm = normalize(outNormal);</span><br><span class="line">   vec3 lightDir = normalize(lightPo - FragPo);    //当前顶点 至 光源的的单位向量</span><br><span class="line">   float diff = max(dot(norm,paraLightDir),0.0);</span><br><span class="line">   vec3 diffuse = diff * lightColor*texture(Texture,outTexCoord).rgb;</span><br><span class="line"></span><br><span class="line">   //镜面反射</span><br><span class="line">   vec3 viewDir = normalize(viewPo - FragPo);</span><br><span class="line">   vec3 reflectDir = reflect(-paraLightDir,outNormal);</span><br><span class="line">   float spec = pow(max(dot(viewDir, reflectDir),0.0),reflectance);</span><br><span class="line">   vec3 specular = specularStrength * spec * texture(specularTexture,outTexCoord).rgb;</span><br><span class="line"></span><br><span class="line">   //光线衰弱</span><br><span class="line">   float constantPara = 1.0f;</span><br><span class="line">   float linearPara = 0.09f;</span><br><span class="line">   float quadraticPara = 0.032f;</span><br><span class="line">   float LFDistance = length(lightPo - FragPo);</span><br><span class="line">   float lightWeakPara = 1.0/(constantPara + linearPara * LFDistance + quadraticPara * (LFDistance*LFDistance));</span><br><span class="line"></span><br><span class="line">   vec3 res = ambient + diffuse + specular;</span><br><span class="line"></span><br><span class="line">   FragColor = vec4(res,1.0);</span><br></pre></td></tr></table></figure>
+<h2 id="点光源"><a href="#点光源" class="headerlink" title="点光源"></a>点光源</h2><p>点光源就是比较正常的光源,光从光源四散发出,光线的向量就等于光源到物体的向量.<br><img src="/images/OpenGL ES on iOS --- 光照进阶/15125219854634.jpg" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">float ambientStrength = 0.3;    //环境因子</span><br><span class="line">float specularStrength = 2.0;</span><br><span class="line">float reflectance = 256.0;</span><br><span class="line"></span><br><span class="line">float constantPara = 1.0f;    //常亮</span><br><span class="line">float linearPara = 0.09f;     //线性部分因数</span><br><span class="line">float quadraticPara = 0.032f; //二次项部分因数</span><br><span class="line"></span><br><span class="line">//环境光</span><br><span class="line">vec3 ambient = ambientStrength * texture(Texture,outTexCoord).rgb;</span><br><span class="line"></span><br><span class="line">//漫反射</span><br><span class="line">vec3 norm = normalize(outNormal);</span><br><span class="line">vec3 lightDir = normalize(lightPo - FragPo);    //当前顶点 至 光源的的单位向量</span><br><span class="line"></span><br><span class="line">//点光源</span><br><span class="line">float diff = max(dot(norm,lightDir),0.0);   //光源与法线夹角</span><br><span class="line">vec3 diffuse = diff * lightColor*texture(Texture,outTexCoord).rgb;</span><br><span class="line"></span><br><span class="line">//镜面反射</span><br><span class="line">vec3 viewDir = normalize(viewPo - FragPo);</span><br><span class="line">vec3 reflectDir = reflect(-lightDir,outNormal);</span><br><span class="line"></span><br><span class="line">float spec = pow(max(dot(viewDir, reflectDir),0.0),reflectance);</span><br><span class="line">vec3 specular = specularStrength * spec * texture(specularTexture,outTexCoord).rgb;</span><br><span class="line"></span><br><span class="line">float LFDistance = length(lightPo - FragPo);</span><br><span class="line">float lightWeakPara = 1.0/(constantPara + linearPara * LFDistance + quadraticPara * (LFDistance*LFDistance));</span><br><span class="line"></span><br><span class="line">vec3 res = (ambient + diffuse + specular)*lightWeakPara;</span><br><span class="line"></span><br><span class="line">FragColor = vec4(res,1.0);</span><br></pre></td></tr></table></figure>
+<h2 id="聚光源"><a href="#聚光源" class="headerlink" title="聚光源"></a>聚光源</h2><p>聚光源的效果就相当于 手电筒,好比朝向指定范围的点光源~<br><img src="/images/OpenGL ES on iOS --- 光照进阶/15125220581520.jpg" alt=""><br>在使用聚光源时,就需要指定 聚光朝向SpotDir,和切光角ϕ. 当光源指向点的向量和SpotDir的夹角大于ϕ时,则无法被光源照射到.</p>
+<p>但是这样的明暗边界十分明显,效果不够真实</p>
+<p><img src="/images/OpenGL ES on iOS --- 光照进阶/screenshot1.png" alt="初始版本"></p>
+<p>这时,我们就需要将过渡边缘平滑,这时 我们就需要引入两个参数, 内锥角和外锥角. 外锥角就是切光角,而内锥角以内不需要平滑效果, 内锥角和外锥角之间需要平滑过度.<br>代码如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/(一些复杂的计算操作 应该让CPU做,提高效率,不变的量也建议外部传输,避免重复计算)</span><br><span class="line">float inCutOff = cos(radians(10.0f));   //内锥角cos值</span><br><span class="line">float outCutOff = cos(radians(15.0f));  //外锥角cos值</span><br><span class="line">vec3 spotDir = vec3(-1.2f,-1.0f,-2.0f); //聚光朝向</span><br><span class="line"></span><br><span class="line">float theta = dot(lightDir,normalize(-spotDir));    //光源指向物体的向量 和 聚光朝向的 cos值</span><br><span class="line">float epsilon  = inCutOff - outCutOff;  //内外锥角cos差值</span><br><span class="line"></span><br><span class="line">//clamp(a,b,c);若b&lt;a&lt;c 则函数返回值为a 若不是,则返回值最小为b 最大为c</span><br><span class="line">// (theta - outCutOff)/epsilon 若theta的角度小于内锥角 则其值&gt;=1 若theta的角度大于外锥角 则其值&lt;=0 这样光线就在内外锥角之间平滑变化.</span><br><span class="line">float intensity = clamp((theta - outCutOff)/epsilon,0.0,1.0);</span><br></pre></td></tr></table></figure>
+<p>结果:<br><img src="/images/OpenGL ES on iOS --- 光照进阶/screenshot.png" alt="结果"></p>
+<h1 id="光线衰弱"><a href="#光线衰弱" class="headerlink" title="光线衰弱"></a>光线衰弱</h1><p>在现实情况中,光源发出的光线是会随着距离的增长而衰减的, 而且也不是线性衰减的,表现为在距离光源近的这段距离衰减的较快, 在距离光源较远的情况下衰减较慢.<br>通常使用这个公式来模拟光线衰减.</p>
+<p><img src="/images/OpenGL ES on iOS --- 光照进阶/screenshot2.png" alt="衰减公式"></p>
+<blockquote>
+<p>常数项通常保持为1.0，它的主要作用是保证分母永远不会比1小，否则的话在某些距离上它反而会增加强度，这肯定不是我们想要的效果<br>一次项会与距离值相乘，以线性的方式减少强度<br>二次项会与距离的平方相乘，让光源以二次递减的方式减少强度。二次项在距离比较小的时候影响会比一次项小很多，但当距离值比较大的时候它就会比一次项更大了</p>
+</blockquote>
+<p><img src="/images/OpenGL ES on iOS --- 光照进阶/15125247574821.jpg" alt="效果展示"><br>在效果图中,在达到距离100时就近似没有光的效果了.</p>
+<p><img src="/images/OpenGL ES on iOS --- 光照进阶/screenshot3.png" alt="参数距离表"><br>距离与参数的关联.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">float LFDistance = length(lightPo - FragPo);</span><br><span class="line">float lightWeakPara = 1.0/(constantPara + linearPara * LFDistance + quadraticPara * (LFDistance*LFDistance));</span><br><span class="line"></span><br><span class="line">vec3 res = (ambient + diffuse + specular)*lightWeakPara;</span><br></pre></td></tr></table></figure>
+<h1 id="光照贴图"><a href="#光照贴图" class="headerlink" title="光照贴图"></a>光照贴图</h1><p>在一张纹理图中,由于材质不同,所呈现的效果也会有所不同,如同下面这个箱子,金属边框和木头在相同光源下所呈现的1效果肯定有所不同.<br><img src="/images/OpenGL ES on iOS --- 光照进阶/15125252548879.jpg" alt="-w250"></p>
+<p>这时为了在显示光照效果时将其区分开来,则需要引入光照贴图的概念~ 如下图<br><img src="/images/OpenGL ES on iOS --- 光照进阶/15125254567342.jpg" alt="-w250"><br>在该贴图中,对应木头部分为黑色vec3(0.0); 而在金属边框部分 则对应的为灰色, 这样在计算 漫反射或者镜面时,将其作为参考系数,则可以让其呈现不同的效果.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">vec3 spe = texture(specularTexture,outTexCoord).rgb;   //获取镜面光照贴图</span><br><span class="line"> </span><br><span class="line">vec3 viewDir = normalize(viewPo - FragPo);</span><br><span class="line">vec3 reflectDir = reflect(-lightDir,outNormal);</span><br><span class="line"></span><br><span class="line">float spec = pow(max(dot(viewDir, reflectDir),0.0),spL.reflectance);</span><br><span class="line">vec3 specular = point_specularStrength * spec * spe;    //使用光照贴图纹理</span><br></pre></td></tr></table></figure>
+<p><img src="/images/OpenGL ES on iOS --- 光照进阶/screenshot4.png" alt="镜面光照纹理效果"><br>是可以看出箱子铁框的镜面效果 比 木头的效果要强</p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+        
+            <li class="previous">
+                <a href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" title= OpenGL ES on iOS --- 基础光照 >
+                    <span>Previous Post</span>
+                    <span>OpenGL ES on iOS --- 基础光照</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#简述"><span class="toc-number">1.</span> <span class="toc-text">简述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#光源分类"><span class="toc-number">2.</span> <span class="toc-text">光源分类</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#平行光"><span class="toc-number">2.1.</span> <span class="toc-text">平行光</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#点光源"><span class="toc-number">2.2.</span> <span class="toc-text">点光源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#聚光源"><span class="toc-number">2.3.</span> <span class="toc-text">聚光源</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#光线衰弱"><span class="toc-number">3.</span> <span class="toc-text">光线衰弱</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#光照贴图"><span class="toc-number">4.</span> <span class="toc-text">光照贴图</span></a></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+

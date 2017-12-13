@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        iOS安全 -- 数据安全 · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">iOS安全 -- 数据安全</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            iOS安全 -- 数据安全
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = iOS安全>iOS安全</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/11/18</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在正常的iOS系统下,由于沙盒与随机地址的分配的作用下,应用数据的安全是没有问题的,但是在越狱情况下,应用间的数据是共享的,这就存在安全问题,同时也存在手机失窃,面临取证攻击(主要),所以我们在存储敏感数据时要格外小心.</p>
+<h1 id="防止数据泄露的方法"><a href="#防止数据泄露的方法" class="headerlink" title="防止数据泄露的方法"></a>防止数据泄露的方法</h1><h2 id="正式版禁用NSLog-Print"><a href="#正式版禁用NSLog-Print" class="headerlink" title="正式版禁用NSLog/Print"></a>正式版禁用NSLog/Print</h2><p>NSLog方法本质并非向控制台输出调试信息,而是向苹果系统日志(Apple System Log)中输出错误信息,官方解释为</p>
+<blockquote>
+<p>服务器接收到的消息(被输入规则过滤后)会存放在数据仓库(data store)中,该API允许客户端创建查询并搜索消息数据仓库中满足条件的消息.</p>
+</blockquote>
+<p>换句话说可以把NSLog看做printf和syslog的结合体,在调试时将消息发送到Xcode控制台,在设备上运行时将消息发送到系统全局日志.而且此数据外界很容易获得,只需要从Xocde Window-&gt;Devices and Simulator 中就可以获得,例如我运行如下代码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for (int i = 0; i&lt;100; i++) &#123;</span><br><span class="line">    NSLog(@&quot;hahhahahahahahahahaha&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>查看日志:</p>
+<p><img src="images/iOS安全 -- 数据安全/日志.png" alt="日志"></p>
+<p>所以在正式版中一定要禁用NSLog,以免意外.</p>
+<h2 id="HTTP缓存"><a href="#HTTP缓存" class="headerlink" title="HTTP缓存"></a>HTTP缓存</h2><p>URL加载系统会存储未加密的缓存数据,这些数据存储在Cache.db文件中.而这就会将一些敏感数据缓存在本地,导致不必要的安全风险.<br>这是一些清除缓存的API:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 只会删除内存中的缓存</span><br><span class="line">[[NSURLCache sharedURLCache] removeAllCachedResponses];</span><br><span class="line"></span><br><span class="line">//限制缓存容量,然而该API并不能限制缓存,</span><br><span class="line">//此配置只能在内存/硬盘空间不够时给系统发挥作用.   </span><br><span class="line">[[NSURLCache sharedURLCache] setDiskCapacity:0];</span><br><span class="line"></span><br><span class="line">//设置Cache的缓存策略,并不能禁用缓存,而是在下次请求中不再使用缓存而已</span><br><span class="line">manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;</span><br></pre></td></tr></table></figure>
+<p>当我将上面三个方法都实现后,利用AFNetworking访问 <a href="https://www.baidu.com" target="_blank" rel="external">https://www.baidu.com</a> 时在沙盒中仍然有缓存的.</p>
+<p><img src="images/iOS安全 -- 数据安全/缓存.png" alt="缓存"><br>可以看到还是有缓存滴~ 那么该怎么办嘞~</p>
+<h3 id="取消缓存的方法"><a href="#取消缓存的方法" class="headerlink" title="取消缓存的方法"></a>取消缓存的方法</h3><blockquote>
+<p>1,服务器返回响应头禁用缓存,Cache-Control: no-cache,no-store,must-revalidate<br>2,直接在Cache路径中 将缓存文件删除(粗暴有效)</p>
+</blockquote>
+<h2 id="截屏泄露"><a href="#截屏泄露" class="headerlink" title="截屏泄露"></a>截屏泄露</h2><p>用户主动截屏并不是我要讨论的,我们可以在关键界面截屏后提示用户泄密风险(在iOS7后,只能在截屏后获得通知).<br>iOS会在应用进入后台之前对当前应用状态截屏,当重新打开应用时可以生成过度动画,提高用户体验,然而有时这就会泄露关键信息.</p>
+<p>解决方案:</p>
+<blockquote>
+<p>在屏幕被截取前对显示图像进行处理(如加上高斯模糊),在进入应用时将高斯模糊图去掉.</p>
+</blockquote>
+<p>而”截屏”事件发生在应用进入后台之后.所以可以在<code>- (void)applicationDidEnterBackground:(UIApplication *)application</code>方法中实现高斯模糊操作.</p>
+<h2 id="钥匙串的使用"><a href="#钥匙串的使用" class="headerlink" title="钥匙串的使用"></a>钥匙串的使用</h2><p>如果需要存储密码,个人资料等小段敏感数据,使用钥匙串最好不过了.我推荐使用 <strong>SSKeyChain</strong>库,它对钥匙串的操作进行了面向对象的封装.主要有以下几个方法:</p>
+<p>可以将 服务与账号看成不同的文件夹, 服务是行号的上级目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 返回本应用的所有钥匙串信息</span><br><span class="line">[SSKeychain allAccounts];</span><br><span class="line"></span><br><span class="line">//发挥指定服务下的所有钥匙串信息</span><br><span class="line">[SSKeychain accountsForService:&lt;#(NSString *)#&gt;];</span><br><span class="line"></span><br><span class="line">//获取指定服务,账号的密码</span><br><span class="line">[SSKeychain passwordForService:&lt;#(NSString *)#&gt; account:&lt;#(NSString *)#&gt;];</span><br><span class="line"></span><br><span class="line">//删除指定服务,账户的信息</span><br><span class="line">[SSKeychain deletePasswordForService:&lt;#(NSString *)#&gt; account:&lt;#(NSString *)#&gt;];</span><br><span class="line"></span><br><span class="line">//将密码保存到指定服务,账号中</span><br><span class="line">[SSKeychain setPassword:&lt;#(NSString *)#&gt; forService:&lt;#(NSString *)#&gt; account:&lt;#(NSString *)#&gt;];</span><br></pre></td></tr></table></figure>
+<p>除此之外,还要设置钥匙串的保护属性:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">//设置钥匙串的保护属性,有以下几个选项</span><br><span class="line">[SSKeychain setAccessibilityType:&lt;#(CFTypeRef)#&gt;];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//只有设备未被锁定时钥匙串就保持可用</span><br><span class="line">extern const CFStringRef kSecAttrAccessibleWhenUnlocked</span><br><span class="line">    __OSX_AVAILABLE_STARTING(__MAC_10_9, __IPHONE_4_0);</span><br><span class="line">    </span><br><span class="line">//开机之后使用者第一次输入密码后钥匙可用(锁屏也可以)</span><br><span class="line">extern const CFStringRef kSecAttrAccessibleAfterFirstUnlock</span><br><span class="line">    __OSX_AVAILABLE_STARTING(__MAC_10_9, __IPHONE_4_0);</span><br><span class="line"></span><br><span class="line">//钥匙串在始终可用</span><br><span class="line">extern const CFStringRef kSecAttrAccessibleAlways</span><br><span class="line">    __OSX_AVAILABLE_STARTING(__MAC_10_9, __IPHONE_4_0);</span><br><span class="line">    </span><br><span class="line">//只有设备设置密码才可用,且不可以移植到其他设备,一旦取消密码则存储信息会从设备中删除,且无备份(iOS8)</span><br><span class="line">extern const CFStringRef kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly</span><br><span class="line">    __OSX_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0);</span><br><span class="line">    </span><br><span class="line">//只有设备未被锁定时钥匙串就保持可用,且不可移植</span><br><span class="line">extern const CFStringRef kSecAttrAccessibleWhenUnlockedThisDeviceOnly</span><br><span class="line">    __OSX_AVAILABLE_STARTING(__MAC_10_9, __IPHONE_4_0);</span><br><span class="line"></span><br><span class="line">//开机之后使用者第一次输入密码后钥匙可用(锁屏也可以),且不可移植</span><br><span class="line">extern const CFStringRef kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly</span><br><span class="line">    __OSX_AVAILABLE_STARTING(__MAC_10_9, __IPHONE_4_0);</span><br><span class="line">    </span><br><span class="line">//钥匙串始终可用,且不可移植</span><br><span class="line">extern const CFStringRef kSecAttrAccessibleAlwaysThisDeviceOnly</span><br><span class="line">    __OSX_AVAILABLE_STARTING(__MAC_10_9, __IPHONE_4_0);</span><br></pre></td></tr></table></figure>
+<p>注意:</p>
+<blockquote>
+<p>即使删除应用,钥匙串中的信息并不会删除,只有恢复出厂设置才会删除.<br>keychain sharing可以进行钥匙串共享 是指同一家公司的同一个开发者账号开发的不同APP之间的钥匙串信息共享</p>
+</blockquote>
+<h2 id="数据保护API"><a href="#数据保护API" class="headerlink" title="数据保护API"></a>数据保护API</h2><p>苹果公司推出数据保护API,它允许开发者指定文件解密秘钥的生命周期.数据保护API使用用户密码和层级秘钥来加密保护文件的秘钥.作用上就像钥匙串那样保护文件.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">//对options进行配置,设置文件保护级别</span><br><span class="line">NSData* data = [NSData new];</span><br><span class="line">[data writeToFile:@&quot;&quot; options:(NSDataWritingOptions) error:nil];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">typedef NS_OPTIONS(NSUInteger, NSDataWritingOptions) &#123;</span><br><span class="line">    NSDataWritingAtomic = 1UL &lt;&lt; 0,	// Hint to use auxiliary file when saving; equivalent to atomically:YES</span><br><span class="line">    NSDataWritingWithoutOverwriting API_AVAILABLE(macos(10.8), ios(6.0), watchos(2.0), tvos(9.0)) = 1UL &lt;&lt; 1, // Hint to  prevent overwriting an existing file. Cannot be combined with NSDataWritingAtomic.</span><br><span class="line"></span><br><span class="line">    NSDataWritingFileProtectionNone NS_ENUM_AVAILABLE_IOS(4_0)                                  = 0x10000000,</span><br><span class="line">    </span><br><span class="line">    //Comeplete是当前最安全的文件保护等级,锁屏之后文件会不可读.</span><br><span class="line">    NSDataWritingFileProtectionComplete NS_ENUM_AVAILABLE_IOS(4_0)                              = 0x20000000,</span><br><span class="line">    </span><br><span class="line">    //如果文件被当前应用打开,那会暂时禁用该文件的保护,会确保该文件在锁屏时依旧可以写入.若想在锁屏之后再去打开则不可以.</span><br><span class="line">    NSDataWritingFileProtectionCompleteUnlessOpen NS_ENUM_AVAILABLE_IOS(5_0)                    = 0x30000000,</span><br><span class="line">    NSDataWritingFileProtectionCompleteUntilFirstUserAuthentication NS_ENUM_AVAILABLE_IOS(5_0)  = 0x40000000,</span><br><span class="line">    NSDataWritingFileProtectionMask NS_ENUM_AVAILABLE_IOS(4_0)                                  = 0xf0000000,</span><br><span class="line"></span><br><span class="line">    // Options with old names for NSData writing methods. Please stop using these old names.</span><br><span class="line">    NSAtomicWrite = NSDataWritingAtomic	    // Deprecated name for NSDataWritingAtomic</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>从苹果提供的保护措施来看,它的保护措施几乎完全依赖于<strong>用户密码</strong>这个体系,使用钥匙串和数据保护其实就是在沙盒保护的基础上,又加了一层保护而已.<br> 在越狱的情况,或者锁屏密码遭到暴力破解.那么安全就不保了,因此我感觉意义不是那么大.<br>所以我认为可以将钥匙串理解为一个高级沙盒, 它有删除软件数据保留,和钥匙串分享的功能.</p>
+<p>以我个人见解,对于移动端数据安全这里我认为需要这样做:</p>
+<blockquote>
+<p>1, 避免数据泄露(如HTTP缓存….);<br>2, 自己加密,即便是在钥匙串中的密码也是加密过多.这样想要盗窃用户数据不仅要攻克设备密码 也要攻克我们的软件 这样更加安全.</p>
+</blockquote>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+            <li class="next">
+                <a href= "/2017/11/19/iOS安全 -- 数据加密/" title= iOS安全 -- 数据加密 >
+                    <span>Next Post</span>
+                    <span>iOS安全 -- 数据加密</span>
+                </a>
+            </li>
+        
+        
+            <li class="previous">
+                <a href= "/2017/11/18/iOS安全 -- 越狱检测/" title= iOS安全 -- 越狱检测 >
+                    <span>Previous Post</span>
+                    <span>iOS安全 -- 越狱检测</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#防止数据泄露的方法"><span class="toc-number">2.</span> <span class="toc-text">防止数据泄露的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#正式版禁用NSLog-Print"><span class="toc-number">2.1.</span> <span class="toc-text">正式版禁用NSLog/Print</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP缓存"><span class="toc-number">2.2.</span> <span class="toc-text">HTTP缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#取消缓存的方法"><span class="toc-number">2.2.1.</span> <span class="toc-text">取消缓存的方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#截屏泄露"><span class="toc-number">2.3.</span> <span class="toc-text">截屏泄露</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#钥匙串的使用"><span class="toc-number">2.4.</span> <span class="toc-text">钥匙串的使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据保护API"><span class="toc-number">2.5.</span> <span class="toc-text">数据保护API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">2.6.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+

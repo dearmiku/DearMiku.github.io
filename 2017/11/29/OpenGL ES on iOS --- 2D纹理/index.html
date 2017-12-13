@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        OpenGL ES on iOS --- 2D纹理 · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">OpenGL ES on iOS --- 2D纹理</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            OpenGL ES on iOS --- 2D纹理
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/11/29</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>纹理是用来丰富我们绘制物体细节的,它可以是一张2D图片(除了图像外,纹理也被用来存储大量数据,传递到着色器上),就像贴图一样贴在绘制的物体上.</p>
+<h1 id="纹理属性"><a href="#纹理属性" class="headerlink" title="纹理属性"></a>纹理属性</h1><h2 id="纹理坐标"><a href="#纹理坐标" class="headerlink" title="纹理坐标"></a>纹理坐标</h2><p>为了将纹理映射到绘制的物体上,我们需要指定 某个顶点对应着 纹理的那个位置. 通过纹理坐标,标明顶点从纹理图像那一部分采样,之后在图形的其它片段进行片段插值.</p>
+<p>纹理坐标系和顶点坐标系有所不同,顶点坐标系 (0,0)点位于窗口中心. 纹理坐标系 (0,0)点位于 纹理左下角.</p>
+<p>顶点坐标系<br><img src="/images/OpenGL ES on iOS --- 2D纹理/15119166430264.jpg" alt="顶点坐标系"></p>
+<p>纹理坐标系<br><img src="/images/OpenGL ES on iOS --- 2D纹理/15119169959085.jpg" alt="纹理坐标系"></p>
+<h2 id="纹理环绕方式"><a href="#纹理环绕方式" class="headerlink" title="纹理环绕方式"></a>纹理环绕方式</h2><p>当我们将顶点位置设置到纹理坐标之外时,则需要设置纹理环绕方式 来显示纹理图案</p>
+<table>
+<thead>
+<tr>
+<th>环绕属性</th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GL_REPEAT</td>
+<td>重复纹理图案(默认)</td>
+</tr>
+<tr>
+<td>GL_MIRRORED_REPEAT</td>
+<td>镜像重复纹理图案</td>
+</tr>
+<tr>
+<td>GL_CLAMP_TO_EDGE</td>
+<td>将纹理锁定在0~1之间,超出部分重复纹理边缘图案,产生拉伸效果</td>
+</tr>
+<tr>
+<td>GL_CLAMP_TO_BORDER</td>
+<td>超出部分为用户指定边缘颜色</td>
+</tr>
+</tbody>
+</table>
+<p><img src="/images/OpenGL ES on iOS --- 2D纹理/15119175487458.jpg" alt="环绕示意图"></p>
+<h3 id="纹理环绕函数"><a href="#纹理环绕函数" class="headerlink" title="纹理环绕函数"></a>纹理环绕函数</h3><p>glTexParameteri (GLenum target, GLenum pname, GLint param);<br>参数: </p>
+<blockquote>
+<p>target: 指定纹理目标,若为2D纹理 则为 GL_TEXTURE_2D<br>pname: 对应的纹理坐标轴(这里 s,t,r 对应 x,y,z) GL_TEXTURE_WRAP_S ,GL_TEXTURE_WRAP_T<br>param: 环绕方式,填入上面的方式.</p>
+</blockquote>
+<p>对2D纹理时,必须对 s,t坐标轴都进行设置. 若是设置 GL_CLAMP_TO_BORDER 形式,则还需要额外设置 环绕颜色</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">float borderColor[] = &#123; 1.0f, 1.0f, 0.0f, 1.0f &#125;;</span><br><span class="line">glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);</span><br></pre></td></tr></table></figure>
+<h2 id="纹理过滤"><a href="#纹理过滤" class="headerlink" title="纹理过滤"></a>纹理过滤</h2><p>纹理坐标是不依赖于 纹理大小和分辨率的, 1就表示纹理的边缘.但是物体和和纹理大小可能不一致,这就造成了对纹理的放大和拉伸.这时如何将纹理像素映射到纹理坐标上,就需要我们设置. 该属性就是 纹理过滤.</p>
+<p>纹理过滤有很多种,下面是最重要的两种</p>
+<h3 id="邻近过滤"><a href="#邻近过滤" class="headerlink" title="邻近过滤"></a>邻近过滤</h3><p>GL_NEAREST 是默认的纹理过滤方式,它会选择距离 纹理坐标最近的像素点作为样本颜色.当纹理被放大时,会有颗粒感<br><img src="/images/OpenGL ES on iOS --- 2D纹理/15119191609889.jpg" alt="临近过滤"></p>
+<h3 id="线性过滤"><a href="#线性过滤" class="headerlink" title="线性过滤"></a>线性过滤</h3><p>GL_LINEAR, 会基于当前纹理坐标附近的像素点计算一个插值,也就是附近纹理的混合色,离得越近的像素点,颜色贡献越大,当纹理被放大时,会比临近过滤更平滑.<br><img src="/images/OpenGL ES on iOS --- 2D纹理/15119194640734.jpg" alt="线性过滤"><img src="/images/OpenGL ES on iOS --- 2D纹理/15119195201570.jpg" alt="临近过滤和线性过滤比较"></p>
+<h3 id="过滤函数"><a href="#过滤函数" class="headerlink" title="过滤函数"></a>过滤函数</h3><p>我们需要对放大(Magnify)和缩小(Minify)的情况设置过滤效果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);</span><br></pre></td></tr></table></figure>
+<h2 id="多级渐远纹理"><a href="#多级渐远纹理" class="headerlink" title="多级渐远纹理"></a>多级渐远纹理</h2><p>在3D世界,根据物体的远近不同,物体也存在缩放的效果,要显示不同的分辨率,若都使用相同的分辨率,一是会使物体产生不真实的效果,二是会造成内存的浪费. 在研究3D纹理时再说.~~</p>
+<h1 id="纹理代码"><a href="#纹理代码" class="headerlink" title="纹理代码"></a>纹理代码</h1><p>首先是设置 上下文,着色器,程序对象…的方法.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">context1 = [[EAGLContext alloc] initWithAPI:(kEAGLRenderingAPIOpenGLES3)];</span><br><span class="line">    BOOL isSetCOntextRight = [EAGLContext setCurrentContext:context1];</span><br><span class="line">    if (!isSetCOntextRight) &#123;</span><br><span class="line">        printf(&quot;设置Context失败&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    NSString* verStr = [[NSBundle mainBundle] pathForResource:@&quot;Texture2D_Vert.glsl&quot; ofType:nil];</span><br><span class="line">    NSString* fragStr = [[NSBundle mainBundle]pathForResource:@&quot;Texture2D_Frag.glsl&quot; ofType:nil];</span><br><span class="line"></span><br><span class="line">    program1 = createGLProgramFromFile(verStr.UTF8String, fragStr.UTF8String);</span><br><span class="line">    glUseProgram(program1);</span><br><span class="line"></span><br><span class="line">    //创建,绑定渲染缓存 并分配空间</span><br><span class="line">    glGenRenderbuffers(1, &amp;renderBuf1);</span><br><span class="line">    glBindRenderbuffer(GL_RENDERBUFFER, renderBuf1);</span><br><span class="line">    // 为 color renderbuffer 分配存储空间</span><br><span class="line">    [context1 renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer*)self.layer];</span><br><span class="line"></span><br><span class="line">    //创建,绑定帧缓存 并分配空间</span><br><span class="line">    glGenFramebuffers(1, &amp;frameBuf1);</span><br><span class="line">    // 设置为当前 framebuffer</span><br><span class="line">    glBindFramebuffer(GL_FRAMEBUFFER, frameBuf1);</span><br><span class="line">    // 将 _colorRenderBuffer 装配到 GL_COLOR_ATTACHMENT0 这个装配点上</span><br><span class="line">    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,</span><br><span class="line">                              GL_RENDERBUFFER, renderBuf1);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    glClearColor(1.0, 0.0, 0.0, 1.0);</span><br><span class="line">    glClear(GL_COLOR_BUFFER_BIT);</span><br><span class="line">    glViewport(0, 0, self.frame.size.width, self.frame.size.height);</span><br></pre></td></tr></table></figure>
+<p>然后是 绘制物体的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">float verData[] = &#123;</span><br><span class="line">        // 位置              颜色                 纹理坐标</span><br><span class="line">        0.5f,0.5f,0.0f,     1.0f,0.0f,0.0f,     1.0f,1.0f,</span><br><span class="line">        0.5f,-0.5f,0.0f,    0.0f,1.0f,0.0f,     1.0f,0.0f,</span><br><span class="line">        -0.5f,-0.5f,0.0f,   0.0f,0.0f,1.0f,     0.0f,0.0f,</span><br><span class="line">        -0.5f,0.5f,0.0f,    1.0f,1.0f,0.0f,     0.0f,1.0f,</span><br><span class="line">    &#125;;</span><br><span class="line">    unsigned int indices[] = &#123;</span><br><span class="line">        0,1,3,</span><br><span class="line">        1,2,3</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    glGenVertexArrays(1, &amp;VAO1);</span><br><span class="line">    glGenBuffers(1, &amp;VBO1);</span><br><span class="line">    glGenBuffers(1, &amp;EBO1);</span><br><span class="line"></span><br><span class="line">    glBindVertexArray(VAO1);</span><br><span class="line">    glBindBuffer(GL_ARRAY_BUFFER, VBO1);</span><br><span class="line">    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO1);</span><br><span class="line"></span><br><span class="line">    glBufferData(GL_ARRAY_BUFFER, sizeof(verData), verData, GL_STATIC_DRAW);</span><br><span class="line">    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);</span><br><span class="line"></span><br><span class="line">    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);</span><br><span class="line">    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));</span><br><span class="line">    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));</span><br><span class="line"></span><br><span class="line">    glEnableVertexAttribArray(0);</span><br><span class="line">    glEnableVertexAttribArray(1);</span><br><span class="line">    glEnableVertexAttribArray(2);</span><br></pre></td></tr></table></figure>
+<h2 id="纹理设置"><a href="#纹理设置" class="headerlink" title="纹理设置~~"></a>纹理设置~~</h2><p>stbi_image 一个非常流行的单头文件图像加载库 <a href="https://github.com/nothings/stb/blob/master/stb_image.h" target="_blank" rel="external">stbi_image</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">//因为使用 stbi 函数导入的图片会颠倒,所以需要将其摆正</span><br><span class="line">stbi_set_flip_vertically_on_load(true);</span><br><span class="line"></span><br><span class="line">NSString* imPath = [[NSBundle mainBundle] pathForResource:@&quot;wall.jpg&quot; ofType:nil];</span><br><span class="line">int width,height,nrChannels;</span><br><span class="line"></span><br><span class="line">//加载图片</span><br><span class="line">unsigned char * imdata = stbi_load(imPath.UTF8String, &amp;width, &amp;height, &amp;nrChannels, 0);</span><br><span class="line"></span><br><span class="line">//创建 纹理</span><br><span class="line">unsigned int texture;</span><br><span class="line">glGenTextures(1, &amp;texture);</span><br><span class="line"></span><br><span class="line">//激活纹理单元0</span><br><span class="line">glActiveTexture(GL_TEXTURE0);</span><br><span class="line">//绑定纹理</span><br><span class="line">glBindTexture(GL_TEXTURE_2D, texture);</span><br><span class="line">//将图像传入纹理</span><br><span class="line">glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imdata);</span><br><span class="line"></span><br><span class="line">//glGenerateMipmap(GL_TEXTURE_2D);</span><br><span class="line"></span><br><span class="line">//设置纹理环绕和纹理过滤</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);</span><br><span class="line"></span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);</span><br><span class="line"></span><br><span class="line">//将不用的图像释放</span><br><span class="line">stbi_image_free(imdata);</span><br><span class="line"></span><br><span class="line">//将纹理作为统一变量传入显存</span><br><span class="line">glUniform1i(glGetUniformLocation(program1, &quot;outTexture&quot;), 0);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//这里PNG格式 通过stbi_load 拉入时 会导致产生 BGRA格式(我也不大清楚原因,懂的朋友 告告我 先O(∩_∩)O谢谢了) ,这时 图片作为纹理显示时色彩会出错.所以将其转换一蛤~</span><br><span class="line">NSString* imPath1 = [[NSBundle mainBundle] pathForResource:@&quot;face.png&quot; ofType:nil];</span><br><span class="line">int width1,height1,nrChannels1;</span><br><span class="line">unsigned char * imdata1 = stbi_load(imPath1.UTF8String, &amp;width1, &amp;height1, &amp;nrChannels1, STBI_rgb_alpha);</span><br><span class="line">for (int i = 0; i&lt;width1*height1; i++ ) &#123;</span><br><span class="line">    char tR = imdata1[i*4+2];</span><br><span class="line">    imdata1[i*4+2] = imdata1[i*4];</span><br><span class="line">    imdata1[i*4] = tR;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">unsigned int texture1;</span><br><span class="line"></span><br><span class="line">glGenTextures(1, &amp;texture1);</span><br><span class="line">glActiveTexture(GL_TEXTURE1);       //必须先写这个再绑定</span><br><span class="line">glBindTexture(GL_TEXTURE_2D, texture1);</span><br><span class="line"></span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);</span><br><span class="line"></span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);</span><br><span class="line"></span><br><span class="line">glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width1, height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, imdata1);</span><br><span class="line">glGenerateMipmap(GL_TEXTURE_2D);</span><br><span class="line">stbi_image_free(imdata1);</span><br><span class="line"></span><br><span class="line">glUniform1i(glGetUniformLocation(program1, &quot;outTexture1&quot;), 1);</span><br><span class="line"></span><br><span class="line">//绘制显示</span><br><span class="line">glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);</span><br><span class="line">[context1 presentRenderbuffer:GL_RENDERBUFFER];</span><br></pre></td></tr></table></figure>
+<p>片段着色器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#version 300 es</span><br><span class="line"></span><br><span class="line">precision mediump float;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">in vec2 outTexCoord;</span><br><span class="line"></span><br><span class="line">uniform sampler2D outTexture;</span><br><span class="line">uniform sampler2D outTexture1;</span><br><span class="line"></span><br><span class="line">in vec3 outColor;</span><br><span class="line"></span><br><span class="line">out vec4 FragColor;</span><br><span class="line"></span><br><span class="line">void main()</span><br><span class="line">&#123;</span><br><span class="line">FragColor = mix(texture(outTexture,outTexCoord),texture(outTexture1,outTexCoord),0.2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>GLSL内建的mix函数需要接受两个值作为参数，并对它们根据第三个参数进行线性插值。如果第三个值是0.0，它会返回第一个输入；如果是1.0，会返回第二个输入值。0.2会返回80%的第一个输入颜色和20%的第二个输入颜色，即返回两个纹理的混合色。</p>
+<h3 id="函数补充说明"><a href="#函数补充说明" class="headerlink" title="函数补充说明"></a>函数补充说明</h3><p>glTexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);</p>
+<blockquote>
+<p>target 纹理目标 设置为GL_TEXTURE_2D意味着会生成与当前绑定的纹理对象在同一个目标上的纹理<br>level 为纹理指定多级渐远纹理的级别,0表示基本级别<br>internalformat 希望将纹理存储为何等格式<br>width height 图像宽高<br>border 设置为0 说是历史遗留问题<br>format 源图格式  type 数据格式<br>pixels 图像数据 </p>
+</blockquote>
+<h3 id="纹理单元"><a href="#纹理单元" class="headerlink" title="纹理单元"></a>纹理单元</h3><p>在代码中 使用 <code>glUniform1i</code>方法进行纹理传递 是因为 纹理单元 这个概念.<br>使用<code>glUniform1i</code>可以为纹理采样器分配一个位置值,通过把纹理单元赋值给采样器,就可以一次绑定多个纹理.</p>
+<p>OpenGL至少保证有16个纹理单元供你使用，也就是说你可以激活从GL_TEXTURE0到GL_TEXTRUE15。它们都是按顺序定义的，所以我们也可以通过GL_TEXTURE0 + 8的方式获得GL_TEXTURE8，这在当我们需要循环一些纹理单元的时候会很有用。</p>
+<p>需要注意的是 在绑定纹理时 <strong>先要激活纹理单元</strong>才可以</p>
+<p>显示结果<br><img src="/images/OpenGL ES on iOS --- 2D纹理/Simulator%20Screen%20Shot%20-%20iPhone%20X%20-%202017-11-29%20at%2010.46.10.png" alt="GitHub" title="GitHub,Social Coding" width="375" height="667"></p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+            <li class="next">
+                <a href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" title= OpenGL ES on iOS --- 坐标系统与矩阵转换 >
+                    <span>Next Post</span>
+                    <span>OpenGL ES on iOS --- 坐标系统与矩阵转换</span>
+                </a>
+            </li>
+        
+        
+            <li class="previous">
+                <a href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" title= Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO) >
+                    <span>Previous Post</span>
+                    <span>Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#纹理属性"><span class="toc-number">2.</span> <span class="toc-text">纹理属性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#纹理坐标"><span class="toc-number">2.1.</span> <span class="toc-text">纹理坐标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#纹理环绕方式"><span class="toc-number">2.2.</span> <span class="toc-text">纹理环绕方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#纹理环绕函数"><span class="toc-number">2.2.1.</span> <span class="toc-text">纹理环绕函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#纹理过滤"><span class="toc-number">2.3.</span> <span class="toc-text">纹理过滤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#邻近过滤"><span class="toc-number">2.3.1.</span> <span class="toc-text">邻近过滤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#线性过滤"><span class="toc-number">2.3.2.</span> <span class="toc-text">线性过滤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#过滤函数"><span class="toc-number">2.3.3.</span> <span class="toc-text">过滤函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多级渐远纹理"><span class="toc-number">2.4.</span> <span class="toc-text">多级渐远纹理</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#纹理代码"><span class="toc-number">3.</span> <span class="toc-text">纹理代码</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#纹理设置"><span class="toc-number">3.1.</span> <span class="toc-text">纹理设置~~</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#函数补充说明"><span class="toc-number">3.1.1.</span> <span class="toc-text">函数补充说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#纹理单元"><span class="toc-number">3.1.2.</span> <span class="toc-text">纹理单元</span></a></li></ol></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+

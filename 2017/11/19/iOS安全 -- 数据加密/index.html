@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        iOS安全 -- 数据加密 · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">iOS安全 -- 数据加密</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            iOS安全 -- 数据加密
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = iOS安全>iOS安全</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/11/19</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="Base64"><a href="#Base64" class="headerlink" title="Base64"></a>Base64</h1><p>base64是一种基于64个可打印字符来表示二进制数据的表示方法.严格来说它只能算作一种编码方式.<br>Base64编码之所以称为Base64，是因为其使用64个字符来对任意数据进行编码，同理有Base32、Base16编码</p>
+<h2 id="作用"><a href="#作用" class="headerlink" title="作用:"></a>作用:</h2><blockquote>
+<p>1, 由于某些系统中只能使用ASCII字符。Base64就是用来将非ASCII字符的数据转换成ASCII字符的一种方法.<br>2, 使用SMTP协议 （Simple Mail Transfer Protocol 简单邮件传输协议）来发送邮件。因为这个协议是基于文本的协议，所以如果邮件中包含一幅图片，我们知道图片的存储格式是二进制数据（binary data），而非文本格式，我们必须将二进制的数据编码成文本格式，这时候Base 64 Encoding就派上用场了.<br>3, 通过base64将ASCII不可见字符转换为可见字符</p>
+</blockquote>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用:"></a>使用:</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">//编码</span><br><span class="line">- (NSString *)base64EncodedString;&#123;</span><br><span class="line">NSData *data = [self dataUsingEncoding:NSUTF8StringEncoding];</span><br><span class="line">return [data base64EncodedStringWithOptions:0];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//解码</span><br><span class="line">- (NSString *)base64DecodedString&#123;</span><br><span class="line">NSData *data = [[NSData alloc]initWithBase64EncodedString:self options:0];</span><br><span class="line">return [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h1><p>MD5(消息摘要算法第五版)为计算机安全领域广泛使用的一种<strong>散列函数</strong>，用以提供消息的完整性保护.</p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点:"></a>特点:</h2><blockquote>
+<p>1、压缩性：任意长度的数据，算出的MD5值长度都是固定的(32摘要)。<br>2、容易计算：从原数据计算出MD5值很容易。<br>3、抗修改性：对原数据进行任何改动，哪怕只修改1个字节，所得到的MD5值都有很大区别。<br>4、强抗碰撞(难逆向)：已知原数据和其MD5值，想找到一个具有相同MD5值的数据（即伪造数据）是非常困难的。</p>
+</blockquote>
+<h2 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h2><blockquote>
+<p>1, 数字签名, 当我们传递敏感信息时,可以为利用MD5+时间戳+盐 为消息添加唯一的数字签名,当服务端获得数据后,用相同算法再次签名.进行比较 若不一致 则数据遭到篡改.<br>2, 文件验证, 我们在下载文件时,由于复杂的网络环境,我们下载的文件可能会有内容丢失或篡改的可能性.(例如我们从服务器获取的H5文件遭到了JS注入),利用MD5可以有效防止这些事情的发生.</p>
+</blockquote>
+<h2 id="同类算法"><a href="#同类算法" class="headerlink" title="同类算法"></a>同类算法</h2><p>SHA-1: </p>
+<blockquote>
+<p>会产生一个160位的消息摘要,SHA-1的安全性在2000年以后已经不被大多数的加密场景所接受。2017年荷兰密码学研究小组CWI和Google正式宣布攻破了SHA-1.</p>
+</blockquote>
+<p>SHA-2:</p>
+<blockquote>
+<p>2001年发布，包括SHA-224、SHA-256、SHA-384、SHA-512、SHA-512/224、SHA-512/256。虽然至今尚未出现对SHA-2有效的攻击，它的算法跟SHA-1基本上仍然相似；因此有些人开始发展其他替代的散列算法。</p>
+</blockquote>
+<p>SHA-3:</p>
+<blockquote>
+<p>2015年正式发布，SHA-3并不是要取代SHA-2，因为SHA-2目前并没有出现明显的弱点。由于对MD5出现成功的破解，以及对SHA-0和SHA-1出现理论上破解的方法，NIST感觉需要一个与之前算法不同的，可替换的加密散列算法，也就是现在的SHA-3。</p>
+</blockquote>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>这里是对字符串的散列计算,若对文件则需要先读取文件流再去散列.<br>需要: <code>import &lt;CommonCrypto/CommonDigest.h&gt;</code></p>
+<h3 id="MD5-1"><a href="#MD5-1" class="headerlink" title="MD5"></a>MD5</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- (NSString *)md5String &#123;</span><br><span class="line">    const char *str = self.UTF8String;</span><br><span class="line">    uint8_t buffer[CC_MD5_DIGEST_LENGTH];</span><br><span class="line">    CC_MD5(str, (CC_LONG)strlen(str), buffer);</span><br><span class="line">    return [self stringFromBytes:buffer length:CC_MD5_DIGEST_LENGTH];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="SHA-1"><a href="#SHA-1" class="headerlink" title="SHA-1:"></a>SHA-1:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (NSString *)sha1String &#123;</span><br><span class="line">    const char *str = self.UTF8String;</span><br><span class="line">    uint8_t buffer[CC_SHA1_DIGEST_LENGTH];</span><br><span class="line">    </span><br><span class="line">    CC_SHA1(str, (CC_LONG)strlen(str), buffer);</span><br><span class="line">    </span><br><span class="line">    return [self stringFromBytes:buffer length:CC_SHA1_DIGEST_LENGTH];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="SHA256"><a href="#SHA256" class="headerlink" title="SHA256:"></a>SHA256:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (NSString *)sha256String &#123;</span><br><span class="line">    const char *str = self.UTF8String;</span><br><span class="line">    uint8_t buffer[CC_SHA256_DIGEST_LENGTH];</span><br><span class="line">    </span><br><span class="line">    CC_SHA256(str, (CC_LONG)strlen(str), buffer);</span><br><span class="line">    </span><br><span class="line">    return [self stringFromBytes:buffer length:CC_SHA256_DIGEST_LENGTH];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="SHA512"><a href="#SHA512" class="headerlink" title="SHA512:"></a>SHA512:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (NSString *)sha512String &#123;</span><br><span class="line">    const char *str = self.UTF8String;</span><br><span class="line">    uint8_t buffer[CC_SHA512_DIGEST_LENGTH];</span><br><span class="line">    </span><br><span class="line">    CC_SHA512(str, (CC_LONG)strlen(str), buffer);</span><br><span class="line">    </span><br><span class="line">    return [self stringFromBytes:buffer length:CC_SHA512_DIGEST_LENGTH];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="SHA3"><a href="#SHA3" class="headerlink" title="SHA3:"></a>SHA3:</h3><blockquote>
+<p>需要在github上下载keccak代码包 :<a href="https://github.com/gvanas/KeccakCodePackage" target="_blank" rel="external">https://github.com/gvanas/KeccakCodePackage</a></p>
+</blockquote>
+<h3 id="大文件的计算"><a href="#大文件的计算" class="headerlink" title="大文件的计算:"></a>大文件的计算:</h3><p>这里以MD5为例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">#define FileHashDefaultChunkSizeForReadingData 4096</span><br><span class="line"></span><br><span class="line">- (NSString *)fileMD5Hash &#123;</span><br><span class="line">    //打开一个文件准备读取</span><br><span class="line">    NSFileHandle *fp = [NSFileHandle fileHandleForReadingAtPath:self];</span><br><span class="line">    if (fp == nil) &#123;</span><br><span class="line">    //若路径为文件夹这种的(如:.framework)则会返回Null</span><br><span class="line">        return nil;</span><br><span class="line">    &#125;</span><br><span class="line">    //创建MD5变量</span><br><span class="line">    CC_MD5_CTX hashCtx;</span><br><span class="line">    //初始化MD5变量</span><br><span class="line">    CC_MD5_Init(&amp;hashCtx);</span><br><span class="line">    </span><br><span class="line">    while (YES) &#123;</span><br><span class="line">        @autoreleasepool &#123;</span><br><span class="line">        //读取文件指定长度数据,循环读取避免一次加载到内存过大</span><br><span class="line">            NSData *data = [fp readDataOfLength:FileHashDefaultChunkSizeForReadingData];</span><br><span class="line">            //准备MD5加密,将内容上传</span><br><span class="line">            CC_MD5_Update(&amp;hashCtx, data.bytes, (CC_LONG)data.length);</span><br><span class="line">            </span><br><span class="line">            if (data.length == 0) &#123;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //关闭文件</span><br><span class="line">    [fp closeFile];</span><br><span class="line">    </span><br><span class="line">    //创建MD5结果缓冲区</span><br><span class="line">    uint8_t buffer[CC_MD5_DIGEST_LENGTH];</span><br><span class="line">    //将MD5结果写进缓冲区</span><br><span class="line">    CC_MD5_Final(buffer, &amp;hashCtx);</span><br><span class="line">    </span><br><span class="line">    //原始数据转换为字符串</span><br><span class="line">    return [self stringFromBytes:buffer length:CC_MD5_DIGEST_LENGTH];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (NSString *)stringFromBytes:(uint8_t *)bytes length:(int)length &#123;</span><br><span class="line">    NSMutableString *strM = [NSMutableString string];</span><br><span class="line">    </span><br><span class="line">    for (int i = 0; i &lt; length; i++) &#123;</span><br><span class="line">        [strM appendFormat:@&quot;%02x&quot;, bytes[i]];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    return [strM copy];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于其他的算法文件加密方式也是这样的,它们都是由CommonCrypto库提供的.</p>
+<h3 id="HMAC散列计算-加盐"><a href="#HMAC散列计算-加盐" class="headerlink" title="HMAC散列计算(加盐)"></a>HMAC散列计算(加盐)</h3><p>HMAC是密钥相关的哈希运算消息认证码，HMAC运算利用哈希算法，以一个密钥和一个消息为输入，生成一个消息摘要作为输出。<br>HMAC算法更象是一种加密算法，它引入了密钥，其安全性已经不完全依赖于所使用的HASH算法,有些类似对称加密,但是是不可逆的那种~.<br>以MD5为例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- (NSString *)hmacMD5StringWithKey:(NSString *)key &#123;</span><br><span class="line">    const char *keyData = key.UTF8String;</span><br><span class="line">    const char *strData = self.UTF8String;</span><br><span class="line">    //切换其他散列函数替换这里(如:CC_SHA256_DIGEST_LENGTH)</span><br><span class="line">    uint8_t buffer[CC_MD5_DIGEST_LENGTH];</span><br><span class="line">        //切换其他散列函数替换这里(如:kCCHmacAlgSHA256)</span><br><span class="line">    CCHmac(kCCHmacAlgMD5, keyData, strlen(keyData), strData, strlen(strData), buffer);</span><br><span class="line">    </span><br><span class="line">   //切换其他散列函数替换这里(如:CC_SHA256_DIGEST_LENGTH)</span><br><span class="line">    return [self stringFromBytes:buffer length:CC_MD5_DIGEST_LENGTH];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="AES-对称加密"><a href="#AES-对称加密" class="headerlink" title="AES(对称加密)"></a>AES(对称加密)</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><blockquote>
+<p>美国国家标准技术研究所在2001年发布了高级加密标准（AES）。<br>AES是基于数据块的加密方式，<br>即，每次处理的数据是一块（16字节），当数据不是16字节的倍数时填充，<br>这就是所谓的分组密码（区别于基于比特位的流密码），16字节是分组长度。</p>
+<p>AES在软件及硬件上都能快速地加解密，相对来说较易于实现，</p>
+</blockquote>
+<p><img src="/images/iOS安全 -- 数据加密/media/15110711769529/15110870481411.jpg" alt=""></p>
+<h2 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h2><p>在使用AES时要配置几个加密参数,只有都一致才能使 客户端与服务端 结果一致.</p>
+<h3 id="参数配置"><a href="#参数配置" class="headerlink" title="参数配置"></a>参数配置</h3><h4 id="密钥长度"><a href="#密钥长度" class="headerlink" title="密钥长度"></a>密钥长度</h4><blockquote>
+<p>key常见的长度有三种：128、192和256 bits</p>
+</blockquote>
+<h4 id="加密模式"><a href="#加密模式" class="headerlink" title="加密模式"></a>加密模式</h4><blockquote>
+<p>AES属于块加密（Block Cipher），块加密中有CBC、ECB、CTR、OFB、CFB等几种工作模式.</p>
+</blockquote>
+<h5 id="ECB"><a href="#ECB" class="headerlink" title="ECB"></a>ECB</h5><p>是一种基础的加密方式,AES默认没收,密文被分割成分组长度相等的块（不足补齐），然后单独一个个加密,一个个输出组成密文.</p>
+<p><img src="/images/iOS安全 -- 数据加密/media/15110711769529/15110873264632.jpg" alt=""></p>
+<h5 id="CBC"><a href="#CBC" class="headerlink" title="CBC"></a>CBC</h5><p>这个模式是链式的,后一块需要前一块做基础，第一块需要一个需要初始化向量IV做基础.<br>相同的输入产生不同的输出.<br>能看到的数据是“明文+IV”或“明文+前一个密文”的乱码，所以能隐藏明文.</p>
+<p>所以加密/解密 需要: 明文/密文 + 秘钥 + 初始向量参数</p>
+<p><img src="/images/iOS安全 -- 数据加密/media/15110711769529/15110876564551.jpg" alt=""></p>
+<h4 id="填充方式"><a href="#填充方式" class="headerlink" title="填充方式"></a>填充方式</h4><p>因为AES的算法是把明文分组再处理的,他要求每个分组(16字节)是“满”的,即明文长度必须被16字节整除.</p>
+<p>所以明文最后不足的16字节的要先进行数据填充,把不足16字节的最后一组补成16字节.</p>
+<p>CFB,OFB和CTR模式由于与key进行加密操作的是上一块加密后的密文,因此不需要对最后一段明文进行填充.<br>在iOS SDK中提供了PKCS7Padding.</p>
+<h4 id="初始向量"><a href="#初始向量" class="headerlink" title="初始向量"></a>初始向量</h4><p>正如在CBC模式哪里介绍的,开始加密时,从哪里开始就是初始向量,如不设置则系统默认为0;</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">NSString *const kInitVector = @&quot;初始向量&quot;;</span><br><span class="line"></span><br><span class="line">size_t const kKeySize = kCCKeySizeAES256;//秘钥长度</span><br><span class="line"></span><br><span class="line">+ (NSData *)encryptAES:(NSData *)content key:(NSString *)key &#123;</span><br><span class="line">    </span><br><span class="line">    NSData *contentData = content;</span><br><span class="line">    NSUInteger dataLength = contentData.length;</span><br><span class="line">    </span><br><span class="line">    //设置加密秘钥,因C字符串结束符为&apos;\0&apos; 所以大小+1</span><br><span class="line">    char keyPtr[kKeySize + 1];</span><br><span class="line">    memset(keyPtr, 0, sizeof(keyPtr));</span><br><span class="line">    //应确保大小小于等于16个字节.</span><br><span class="line">    [key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];</span><br><span class="line">    </span><br><span class="line">    //密文长度 = 明文长度+秘钥长度</span><br><span class="line">    size_t encryptSize = dataLength + kCCBlockSizeAES128;</span><br><span class="line">    void *encryptedBytes = malloc(encryptSize);</span><br><span class="line">    </span><br><span class="line">    //密文接受指针</span><br><span class="line">    size_t actualOutSize = 0;</span><br><span class="line">    </span><br><span class="line">    //初始向量</span><br><span class="line">    NSData *initVector = [kInitVector dataUsingEncoding:NSUTF8StringEncoding];</span><br><span class="line">    </span><br><span class="line">    CCCryptorStatus cryptStatus = CCCrypt(kCCEncrypt,               //是加密还是解密</span><br><span class="line">                                          kCCAlgorithmAES,          //加密/解密方式</span><br><span class="line">                                          kCCOptionPKCS7Padding,    //PKCS7Padding</span><br><span class="line">                                          keyPtr,                   //秘钥</span><br><span class="line">                                          kKeySize,                 //秘钥大小</span><br><span class="line">                                          initVector.bytes,         //初始向量</span><br><span class="line">                                          contentData.bytes,        //明文/密文</span><br><span class="line">                                          dataLength,               //明文/密文大小</span><br><span class="line">                                          encryptedBytes,           //结果: 密文/明文缓冲区</span><br><span class="line">                                          encryptSize,              //结果: 密文/明文大小</span><br><span class="line">                                          &amp;actualOutSize);          //结果指针</span><br><span class="line">    </span><br><span class="line">    if (cryptStatus == kCCSuccess) &#123;</span><br><span class="line">        // 成功</span><br><span class="line">        return [NSData dataWithBytesNoCopy:encryptedBytes length:actualOutSize];</span><br><span class="line">    &#125;</span><br><span class="line">    //释放</span><br><span class="line">    free(encryptedBytes);</span><br><span class="line">    return nil;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="RSA"><a href="#RSA" class="headerlink" title="RSA"></a>RSA</h1><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="数学基础"><a href="#数学基础" class="headerlink" title="数学基础"></a>数学基础</h3><p>任意给定正整数n，请问在小于等于n的正整数之中，有多少个与n构成互质的数.计算这个值的函数为 欧拉函数: 如: φ(8) = 4. </p>
+<blockquote>
+<p>若n为质数 则: φ(n) = n-1 <strong>原理3</strong><br>若n为质数的n次方 则: φ(p^k) = p^k - p^(k-1)<br>若n为两个互质整数之积 则: φ(p1 <em> p2) = φ(p1)φ(p2) <strong>原理1</strong><br>若正整数 a和n互质 则: a^φ(n) 被n除的余数为1 则: a^φ(n) %n=1 <strong>欧拉定理</strong><br>若正整数a和质数p互质 则: a^p-1 %p=1 //费马小定理<br>若正整数a和n互质,则一定可以找到正整数b 使: ab%n=1, b为a的模反元素. <em>*原理2</em></em></p>
+</blockquote>
+<h3 id="秘钥生成"><a href="#秘钥生成" class="headerlink" title="秘钥生成"></a>秘钥生成</h3><p>1, 随机生成两个不等质数p和q 如 p=61 q=53</p>
+<p>2, 求出pq乘积n n=p <em> q= 61</em>53=3233.</p>
+<blockquote>
+<p>这里n的长度即为,秘钥长度,如3233为二进制12位,RSA秘钥一般为1024位.</p>
+</blockquote>
+<p>3, 计算φ(n)</p>
+<blockquote>
+<p>根据 原理1 φ(n) = φ(p)φ(q) = (p-1)(q-1) = 3120</p>
+</blockquote>
+<p>4, 随机选择一个整数e 条件为 1&lt;e&lt;φ(n) 且 e与φ(n)互质</p>
+<blockquote>
+<p>假如选择 17</p>
+</blockquote>
+<p>5, 获取e对于φ(n)的模反元素d </p>
+<blockquote>
+<p>ed%φ(n)=1 —&gt; ed -1 = kφ(n) —&gt; 17d + 3120k = 1<br>通过扩展欧几里德算法 可得到一组整数解 d=2753 k=-15</p>
+</blockquote>
+<p>6, 这里 n和e 为公钥     n和d 为私钥</p>
+<h3 id="加密-此处为公钥加密-n-e"><a href="#加密-此处为公钥加密-n-e" class="headerlink" title="加密(此处为公钥加密 n e)"></a>加密(此处为公钥加密 n e)</h3><p> 对明文信息m 加密 注意:m为正整数,且m须小于n</p>
+<blockquote>
+<p><code>m^e % n = c</code> 这里的c就是加密后得到的密文<br>65^17 % 3233 = 2790  这里2790就是加密后的密文</p>
+</blockquote>
+<h3 id="解密-n-d"><a href="#解密-n-d" class="headerlink" title="解密(n d)"></a>解密(n d)</h3><h4 id="解密原理"><a href="#解密原理" class="headerlink" title="解密原理"></a>解密原理</h4><p>解密规则为: c^d %n = m</p>
+<p>因为加密过程为: m^e % n = c —&gt;  c = m^e - kn<br>若想证明解密规则成立 则等同于证明  (m^e - kn)^d % n = m 成立</p>
+<blockquote>
+<p>(m^e - kn)^d % n = m —&gt; m^ed % n = m</p>
+</blockquote>
+<p>由于在制作公私钥 的第5步 所以:</p>
+<blockquote>
+<p>ed%φ(n)=1 —&gt; ed = hφ(n)+1</p>
+</blockquote>
+<p>将ed代入须证明公式:</p>
+<blockquote>
+<p>m^ed % n = m —&gt; m^hφ(n)+1 % n = m</p>
+</blockquote>
+<h5 id="若m-n-互质"><a href="#若m-n-互质" class="headerlink" title="若m n 互质"></a>若m n 互质</h5><p>m^hφ(n)+1 % n = m —&gt; ((m^φ(n))^h * m) % n = m</p>
+<p>由于欧拉定理 m^φ(n) %n=1可得<br>((m^φ(n))^h <em> m) % n = m —&gt; (1^h </em> m) % n = m  则解密公式成立</p>
+<h5 id="若m-n-不互质"><a href="#若m-n-不互质" class="headerlink" title="若m n 不互质"></a>若m n 不互质</h5><p>因为制作公私钥 的第1步 n = p * q  </p>
+<p>因为加密方法 m^e % n = c , 且因 m&lt;n(这里是在制作时要求的) 所以 c肯定不为0 由此可得 m 与 n 不为互质关系.</p>
+<p>由于 n = pq 且 pq互质 所以 n有且只有 p q 两个因子. 然而 m n有公因子 所以 m n 的公因子 必定为 q或p的整数倍. 所以 m = kp 或 kq</p>
+<p>以 m=kp为例  因为上面描述的关系 m<n ,="" m="" n不互质,="" n="qp" 所以="" k与q互质="" ---=""> m与q互质</n></p>
+<p>由欧拉定理得:<br><code>m^φ(q) % q = 1</code> —&gt; 由于q为质数 —&gt; <code>m^q-1 % q = 1</code> –&gt; <code>(kp)^q-1 % q = 1</code></p>
+<p>因为 k与q互质 p与q互质 –&gt; <code>((kp)^q-1 * kp)%q = kp</code></p>
+<p>进一步可以确定该式成立: <code>(((kp)^h(p-1)(q-1)) * kp)%q = kp</code> 因为p为质数 h为任一整数</p>
+<p>由<strong>原理1</strong>和<strong>原理3</strong><code>(((kp)^h(p-1)(q-1)) * kp)%q = kp</code> —&gt; (kp)^hφ(n)+1 %q=kp</p>
+<p>由于 ed%φ(n)=1,且m=kp 所以将h匹配为合适的值得 <code>(kp)^ed %q = kp</code> —&gt; <code>(m)^ed = tq +m</code> t为整数.</p>
+<p>两侧同除m得: <code>(m)^ed-1 = tq/m +1</code> 由于ed为整数,m为整数 故tq/m为整数. 因q与m互质 所以t为m的整数倍 –&gt; t = yp —&gt; <code>m^ed = yn+m</code> —&gt; <code>m^ed % n = m</code></p>
+<p>由于加密方式 <code>m^e % n = c</code> —&gt; <code>c^d % n = m</code></p>
+<h3 id="安全性讨论"><a href="#安全性讨论" class="headerlink" title="安全性讨论"></a>安全性讨论</h3><p>若想破解RSA 则需要在已知 n e的情况下 求 d 因为 </p>
+<blockquote>
+<p>因为 ed%φ(n)=1  所以需知道 φ(n)<br>因为 φ(n) = (p-1)(q-1) 所以需求得 qp<br>因为 qp=n 所以得将n因式分解</p>
+</blockquote>
+<p>而因式分解是十分困难的 特别是对于 特大整数的因式分解. 由于 名文m 需小于 秘钥长度n 所以常用来加密 对称加密的秘钥.</p>
+<h2 id="iOS实现"><a href="#iOS实现" class="headerlink" title="iOS实现"></a>iOS实现</h2><p>参考链接:<a href="http://www.jianshu.com/p/74a796ec5038" target="_blank" rel="external">iOS中使用RSA加密</a><br>在iOS中使用RSA加密解密 需要使用到<strong>.der</strong> 和 <strong>.p12</strong> 后缀格式文件.</p>
+<blockquote>
+<p>.p12 格式文件是用来加密的 私钥<br>.der 格式文件用来解密的 公钥</p>
+</blockquote>
+<p>添加动态库 <strong>Security.framework</strong></p>
+<p>具体实现太长,我汇总了一个类 感兴趣可以下下来看看 如果帮到你 点个Star鼓励一蛤~<a href="https://github.com/dearmiku/MK_EncryOp" target="_blank" rel="external">github链接</a></p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+            <li class="next">
+                <a href= "/2017/11/22/HTTP 2.0/" title= HTTP 2.0 >
+                    <span>Next Post</span>
+                    <span>HTTP 2.0</span>
+                </a>
+            </li>
+        
+        
+            <li class="previous">
+                <a href= "/2017/11/18/iOS安全 -- 数据安全/" title= iOS安全 -- 数据安全 >
+                    <span>Previous Post</span>
+                    <span>iOS安全 -- 数据安全</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Base64"><span class="toc-number">1.</span> <span class="toc-text">Base64</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#作用"><span class="toc-number">1.1.</span> <span class="toc-text">作用:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用"><span class="toc-number">1.2.</span> <span class="toc-text">使用:</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MD5"><span class="toc-number">2.</span> <span class="toc-text">MD5</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#特点"><span class="toc-number">2.1.</span> <span class="toc-text">特点:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#作用-1"><span class="toc-number">2.2.</span> <span class="toc-text">作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#同类算法"><span class="toc-number">2.3.</span> <span class="toc-text">同类算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">2.4.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MD5-1"><span class="toc-number">2.4.1.</span> <span class="toc-text">MD5</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SHA-1"><span class="toc-number">2.4.2.</span> <span class="toc-text">SHA-1:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SHA256"><span class="toc-number">2.4.3.</span> <span class="toc-text">SHA256:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SHA512"><span class="toc-number">2.4.4.</span> <span class="toc-text">SHA512:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SHA3"><span class="toc-number">2.4.5.</span> <span class="toc-text">SHA3:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#大文件的计算"><span class="toc-number">2.4.6.</span> <span class="toc-text">大文件的计算:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HMAC散列计算-加盐"><span class="toc-number">2.4.7.</span> <span class="toc-text">HMAC散列计算(加盐)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#AES-对称加密"><span class="toc-number">3.</span> <span class="toc-text">AES(对称加密)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">3.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现-1"><span class="toc-number">3.2.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#参数配置"><span class="toc-number">3.2.1.</span> <span class="toc-text">参数配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#密钥长度"><span class="toc-number">3.2.1.1.</span> <span class="toc-text">密钥长度</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#加密模式"><span class="toc-number">3.2.1.2.</span> <span class="toc-text">加密模式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ECB"><span class="toc-number">3.2.1.2.1.</span> <span class="toc-text">ECB</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#CBC"><span class="toc-number">3.2.1.2.2.</span> <span class="toc-text">CBC</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#填充方式"><span class="toc-number">3.2.1.3.</span> <span class="toc-text">填充方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#初始向量"><span class="toc-number">3.2.1.4.</span> <span class="toc-text">初始向量</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码"><span class="toc-number">3.2.2.</span> <span class="toc-text">代码</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RSA"><span class="toc-number">4.</span> <span class="toc-text">RSA</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#原理"><span class="toc-number">4.1.</span> <span class="toc-text">原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#数学基础"><span class="toc-number">4.1.1.</span> <span class="toc-text">数学基础</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#秘钥生成"><span class="toc-number">4.1.2.</span> <span class="toc-text">秘钥生成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#加密-此处为公钥加密-n-e"><span class="toc-number">4.1.3.</span> <span class="toc-text">加密(此处为公钥加密 n e)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解密-n-d"><span class="toc-number">4.1.4.</span> <span class="toc-text">解密(n d)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#解密原理"><span class="toc-number">4.1.4.1.</span> <span class="toc-text">解密原理</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#若m-n-互质"><span class="toc-number">4.1.4.1.1.</span> <span class="toc-text">若m n 互质</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#若m-n-不互质"><span class="toc-number">4.1.4.1.2.</span> <span class="toc-text">若m n 不互质</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安全性讨论"><span class="toc-number">4.1.5.</span> <span class="toc-text">安全性讨论</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iOS实现"><span class="toc-number">4.2.</span> <span class="toc-text">iOS实现</span></a></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+

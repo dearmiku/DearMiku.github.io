@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        OpenGL ES on iOS --- 坐标系统与矩阵转换 · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            OpenGL ES on iOS --- 坐标系统与矩阵转换
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/12/01</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h1><p>本文记录我记录我学习 坐标体系和矩阵转换的过程,加深学习便于后续查询,可能有些描述不够准确,或者内容不够充实,还请多多指正,共同学习</p>
+<h1 id="矩阵变换"><a href="#矩阵变换" class="headerlink" title="矩阵变换"></a>矩阵变换</h1><p>我们将物体坐标进行一系列变换,达到自己期望的位置,需要使用到矩阵.先说一下矩阵的公式.这里我是本着了解的心态去学习的,因为已经有趁手的数学工具了,把重要的学完~ 我会再来研究这里的.</p>
+<h2 id="矩阵相乘"><a href="#矩阵相乘" class="headerlink" title="矩阵相乘"></a>矩阵相乘</h2><p>这是一个简单的矩阵相乘例子,<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/screenshot2.png" alt="例子"><br>这是矩阵乘法过程~<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/screenshot3.png" alt="矩阵乘法过程"></p>
+<p>注意:</p>
+<blockquote>
+<p>1, 矩阵相乘不遵守交换律 即 A <em> B ≠ B </em> A<br>2, 只有当左侧矩阵列数 等于 右侧矩阵行数 两矩阵才能相乘.</p>
+</blockquote>
+<p>在我们对坐标进行缩放,位移,旋转 等变换时,我们多用4x4矩阵来进行~</p>
+<h2 id="缩放"><a href="#缩放" class="headerlink" title="缩放"></a>缩放</h2><p>我们把缩放变量表示为(S1,S2,S3)我们可以为任意向量(x,y,z)定义一个缩放矩阵：<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/screenshot1.png" alt="缩放矩阵"></p>
+<h2 id="位移"><a href="#位移" class="headerlink" title="位移"></a>位移</h2><p>如果我们把位移向量表示为(Tx,Ty,Tz)，我们就能把位移矩阵定义为：<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/screenshot4.png" alt="位移矩阵"></p>
+<h2 id="旋转"><a href="#旋转" class="headerlink" title="旋转"></a>旋转</h2><p>绕X轴旋转<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/screenshot5.png" alt="x轴旋转"><br>绕y轴旋转<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/screenshot6.png" alt="y轴旋转"><br>绕z轴旋转<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/screenshot7.png" alt="z轴旋转"></p>
+<p>将旋转分为绕3个轴进行旋转,以达到自己希望的位置,见下面这个公式，(Rx,Ry,Rz)代表任意旋转轴：<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/screenshot8.png" alt="任意旋转"></p>
+<p>这种处理方式,简单容易理解,但是 会出现一个问题<strong>万向节死锁</strong>.</p>
+<p>举个栗子~ 加入在三维空间中有一个平行于X中的向量,然后将它绕Y轴旋转至它平行于Z轴,这时绕z轴的任何旋转都不会改变 向量的方向了. 在正常情况下,关于3个轴的旋转过程应该是可以任意组合的,最终旋转结果都是一致的,但是当出现了万向节死锁后, 就会导致各个轴旋转顺序 组合不同,而最终旋转结果不同~ 大家可以找根笔试一试~也可以看看这里:<a href="http://blog.csdn.net/andrewfan/article/details/60981437" target="_blank" rel="external">欧拉角与万向节死锁（图文版</a></p>
+<p>那么如何解决呢~ 使用四元数 <a href="http://insaneguy.me/2015/03/25/rotation_matrix_and_quaternions/" target="_blank" rel="external">旋转矩阵与四元数</a> 因为复变函数早已还给老师~ 后续再研究补充~~</p>
+<h2 id="齐次坐标"><a href="#齐次坐标" class="headerlink" title="齐次坐标"></a>齐次坐标</h2><p>在上面关于描述3D坐标的向量 是四维向量,多出一个分量w,w分量的用处是来创造3D视觉效果的,根据w分量的大小对物体进行拉伸,最后将w=1的截面进行展示,从而产生物体远近效果. 这篇文章我觉得介绍的比较详细 <a href="http://www.jianshu.com/p/7e701d7bfd79" target="_blank" rel="external">写给大家看的“透视除法” —— 齐次坐标和投影</a></p>
+<h2 id="组合"><a href="#组合" class="headerlink" title="组合"></a>组合</h2><p>我将不同变换的矩阵组合起来~ 将一个放大2倍的矩阵 和位移(1,2,3)的矩阵组合起来~,得到新的变换矩阵<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/screenshot9.png" alt="矩阵组合"></p>
+<p>将得到的变换矩阵 进行验证<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/screenshot9.png" alt="矩阵验证"></p>
+<p>因为矩阵相乘是不遵守<em>交换律</em>的,所以在矩阵组合时,顺序就十分重要, 建议 先缩放 –&gt; 再旋转 –&gt; 再位移. 并且矩阵的顺序是从右到左的  所以应该是<br>位移矩阵 <em> 旋转矩阵 </em> 缩放矩阵 = 所需矩阵</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>为什么我们要用矩阵来进行着一系列的变换呢? 据我了解 是因为这样做,将 旋转,位移,缩放加以统一.简化计算流程,提高计算机的计算效率.</p>
+<p>最后总结:像这样利用矩阵进行位移,缩放,旋转 这一系列的变换叫做:<strong>仿射变换</strong></p>
+<h1 id="坐标体系"><a href="#坐标体系" class="headerlink" title="坐标体系"></a>坐标体系</h1><p>OpenGL 顶点着色器 希望接受的的顶点 都是<strong>标准化设备坐标</strong>(Normalized Device Coordinate, NDC)的坐标,也就是(x,y,z)都是在 -1~1之间变换.在此之外的顶点丢弃,并且按照传入的顶点进行绘制.</p>
+<p>将3D的物体坐标转换到理想的绘制效果需要进行一些列的转换过程.<br>局部空间(Local Space)/物体空间(Object Space) —&gt; 世界空间(World Space) —&gt; 观察空间(View Space)/视觉空间(Eye Space) —&gt;裁剪空间(Clip Space) —&gt; 屏幕空间(Screen Space)</p>
+<p>OpenGL是不提供数学工具的~ 我们可以使用 <strong>GLM(OpenGL Mathematics)</strong> <a href="http://glm.g-truc.net/0.9.9/index.html" target="_blank" rel="external">GLM官网</a> 我用的是0.9.9版本~</p>
+<p>示意图:<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/15120025806643.jpg" alt="坐标空间变换"></p>
+<h2 id="局部空间"><a href="#局部空间" class="headerlink" title="局部空间"></a>局部空间</h2><p>局部空间: 就表示物体在自己本身坐标系里的坐标,比较像view的bounds属性.可以理解为建模时模型的坐标. </p>
+<h2 id="世界空间"><a href="#世界空间" class="headerlink" title="世界空间"></a>世界空间</h2><p>世界空间: 表示物体需要展示世界里的坐标,比较像view的frame属性,好比我们的模型是个房子,将它放到小镇(世界)中, 这时它的坐标就是在世界空间的坐标.</p>
+<p>将局部空间坐标转换为世界空间坐标需要进行一系列转换,就像在象棋棋盘上放棋子,我们需要将棋子旋转,位移…操作才能将棋子放到正确的位置上.</p>
+<h2 id="观察空间"><a href="#观察空间" class="headerlink" title="观察空间"></a>观察空间</h2><p>在最终展示时,我们展示的是用户观察的界面, 我们需要将世界空间的坐标 转换为 以用户坐标观察视野产生的结果.</p>
+<h2 id="裁剪空间"><a href="#裁剪空间" class="headerlink" title="裁剪空间"></a>裁剪空间</h2><p>在OpenGL 中所期望的坐标是 标准化设备坐标, 所以我们 需要将自己的坐标集进行转换,将需要显示的坐标 落在 -1.0~1.0之间. </p>
+<p>如果只是图元(Primitive)，例如三角形，的一部分超出了裁剪体积(Clipping Volume)，则OpenGL会重新构建这个三角形为一个或多个三角形让其能够适合这个裁剪范围,就像三角形的角被切了一刀变成四边形那样~</p>
+<h3 id="投影"><a href="#投影" class="headerlink" title="投影"></a>投影</h3><p>在裁剪时,我们是将3D空间的物体 转换为 2D空间的平面图像, 这样的过程叫做投影, 像投影截取的显示的3D空间 <strong>平截头体</strong>,它就像一个容器,在这里面的所有坐标都不会被裁剪掉~</p>
+<h4 id="正射投影"><a href="#正射投影" class="headerlink" title="正射投影"></a>正射投影</h4><p>在裁剪空间阶段,获得平截头体的方式, 就是通过 正射投影. 使用正射投影矩阵创天平截头体 需要指定 近平面宽高, 远平面宽高.<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/15120115864167.jpg" alt=""><br>通过正射投影矩阵,将3D空间的坐标 映射到2D平面中,但是这样产生的问题是 并没有远近缩放的效果,这时就需要 透视投影.</p>
+<h4 id="透视投影"><a href="#透视投影" class="headerlink" title="透视投影"></a>透视投影</h4><p>透视投影,就是利用齐次坐标w 来生成远近效果的, 离观察者越远的顶点 w分量越大.在显示时,顶点坐标的每个分量都会除以w分量,进而使 远端的物体小,近端的物体大.</p>
+<p>透视矩阵 会根据平截头体的顶点的远近,对顶点w分量进行修改</p>
+<h2 id="组合-1"><a href="#组合-1" class="headerlink" title="组合"></a>组合</h2><p>若上面每一个步骤都产生一个变换矩阵的话,那么最终的顶点坐标应该是这个样子的<br>目标顶点 = 投影矩阵 <em> 观察矩阵 </em> 模型矩阵 *原始顶点</p>
+<h2 id="标准化设备坐标"><a href="#标准化设备坐标" class="headerlink" title="标准化设备坐标"></a>标准化设备坐标</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//此方法创建的窗口就是对应的OpenGL 的标准化设备窗口</span><br><span class="line">glViewport(0, 0, self.frame.size.width, self.frame.size.height);</span><br></pre></td></tr></table></figure>
+<h2 id="模型矩阵"><a href="#模型矩阵" class="headerlink" title="模型矩阵"></a>模型矩阵</h2><p>模型矩阵 包含了 位移,缩放,旋转操作, 它将应用到物体的所有定点上. 该矩阵的目的就是将原来位于 世界空间(0,0,0)点的物体 移动到它应该出现的位置.</p>
+<h2 id="观察矩阵"><a href="#观察矩阵" class="headerlink" title="观察矩阵"></a>观察矩阵</h2><p>观察矩阵就像是 3D世界里的摄像机,最终显示的画面 就是摄影机的位置 和 方向 观察的画面~ 观察矩阵的创建就需要 GLM 提供的LooK AT 函数:</p>
+<p>tmat4x4<t, p=""> lookAt(tvec3<t, p=""> const &amp; eye, tvec3<t, p=""> const &amp; center, tvec3<t, p=""> const &amp; up)</t,></t,></t,></t,></p>
+<p>该函数需要输入 3个 vec3变量,返回观察矩阵:</p>
+<blockquote>
+<p>参数1: 相机在世界坐标系的位置<br>参数2: 相机镜头指向的位置<br>参数3: 世界的上向量,上向量的方向 在显示时 是指向屏幕上方的向量  </p>
+</blockquote>
+<p>通过对这三个变量控制,就可以实现我们希望的效果,我在练习时 实现的是类似 游戏CS里 摄像头移动的方式</p>
+<h2 id="投影矩阵"><a href="#投影矩阵" class="headerlink" title="投影矩阵"></a>投影矩阵</h2><p>glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.1f, 100.0f);</p>
+<p>此函数其实是创建了一个 定义了 可视控件的 平头截体,此空间以外的东西都将被抛弃~<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/15120295944189.jpg" alt=""><br>参数:</p>
+<blockquote>
+<p>第一个参数定义了<strong>fov值</strong>,它表示了视野(Field of View),就相当于摄影机的摄影角度~~<br>第二个参数 为宽高比, 由视口的宽/高所得<br>第三和第四个参数 设置了平截头体的近和远平面。我们通常设置近距离为0.1f，而远距离设为100.0f。所有在近平面和远平面内且处于平截头体内的顶点都会被渲染.</p>
+</blockquote>
+<p>最后经过透视矩阵的处理,就产生了 物体 远小近大的效果了~</p>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>这里就捡与本文相关的说~ </p>
+<h2 id="顶点着色器"><a href="#顶点着色器" class="headerlink" title="顶点着色器"></a>顶点着色器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">#version 300 es</span><br><span class="line"></span><br><span class="line">layout(location = 0) in vec3 position;</span><br><span class="line">layout(location = 1) in vec3 color;</span><br><span class="line">layout(location = 2) in vec2 texCoord;  //纹理坐标</span><br><span class="line"></span><br><span class="line">//uniform mat4 transform;</span><br><span class="line"></span><br><span class="line">uniform mat4 model;</span><br><span class="line">uniform mat4 view;</span><br><span class="line">uniform mat4 projection;</span><br><span class="line"></span><br><span class="line">out vec3 outColor;</span><br><span class="line">out vec2 outTexCoord;</span><br><span class="line"></span><br><span class="line">void main()</span><br><span class="line">&#123;</span><br><span class="line">    gl_Position = projection*view*model*vec4(position,1.0);</span><br><span class="line">    outColor = color;</span><br><span class="line">    outTexCoord = texCoord;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="开启深度测试"><a href="#开启深度测试" class="headerlink" title="开启深度测试"></a>开启深度测试</h2><p>OpenGL存储它的所有深度信息于一个<strong>Z缓冲(Z-buffer)</strong>中，也被称为深度缓冲(Depth Buffer)。GLFW会自动为你生成这样一个缓冲（就像它也有一个颜色缓冲来存储输出图像的颜色）。深度值存储在每个片段里面（作为片段的z值），当片段想要输出它的颜色时，OpenGL会将它的深度值和z缓冲进行比较，如果当前的片段在其它片段之后，它将会被丢弃，否则将会覆盖。这个过程称为<strong>深度测试(Depth Testing)</strong>，它是由OpenGL自动完成的。</p>
+<p>深度测试还有其他关于 自定以的函数,以后再说~~</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">int wi,he;</span><br><span class="line">//检索有关绑定缓冲区的对象的信息 ,这里获得了layer的宽高</span><br><span class="line">glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &amp;wi);</span><br><span class="line">glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &amp;he);</span><br><span class="line"></span><br><span class="line">glGenRenderbuffers(1, &amp;depthBuf);</span><br><span class="line">glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);</span><br><span class="line">glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, wi, he);</span><br><span class="line"></span><br><span class="line">//还要记得开启深度测试</span><br><span class="line">  glEnable(GL_DEPTH_TEST);</span><br></pre></td></tr></table></figure>
+<h2 id="模型矩阵-1"><a href="#模型矩阵-1" class="headerlink" title="模型矩阵"></a>模型矩阵</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">glm::vec3 cubePositions[] = &#123;</span><br><span class="line">      glm::vec3( 0.0f,  0.0f,  0.0f),</span><br><span class="line">      glm::vec3( 2.0f,  5.0f, -15.0f),</span><br><span class="line">      glm::vec3(-1.5f, -2.2f, -2.5f),</span><br><span class="line">      glm::vec3(-3.8f, -2.0f, -12.3f),</span><br><span class="line">      glm::vec3( 2.4f, -0.4f, -3.5f),</span><br><span class="line">      glm::vec3(-1.7f,  3.0f, -7.5f),</span><br><span class="line">      glm::vec3( 1.3f, -2.0f, -2.5f),</span><br><span class="line">      glm::vec3( 1.5f,  2.0f, -2.5f),</span><br><span class="line">      glm::vec3( 1.5f,  0.2f, -1.5f),</span><br><span class="line">      glm::vec3(-1.3f,  1.0f, -1.5f)</span><br><span class="line">  &#125;;</span><br><span class="line">  for(unsigned int i = 0; i &lt; 10; i++)</span><br><span class="line">  &#123;</span><br><span class="line">      //模型矩阵</span><br><span class="line">      glm::mat4 model;</span><br><span class="line">      model = glm::translate(model, cubePositions[i]);</span><br><span class="line">      float angle = 20.0f * i;</span><br><span class="line">      model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));</span><br><span class="line">      glUniformMatrix4fv(glGetUniformLocation(program, &quot;model&quot;), 1, GL_FALSE, glm::value_ptr(model));</span><br><span class="line"></span><br><span class="line">      glDrawArrays(GL_TRIANGLES, 0, 36);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>这里的模型矩阵 将物体 进行位移,旋转后 放在世界坐标系中合适的位置.</p>
+<h2 id="观察矩阵-1"><a href="#观察矩阵-1" class="headerlink" title="观察矩阵"></a>观察矩阵</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">定义了 相机的初始位置 与 初始方向(这里讲方向保持为单位向量)</span><br><span class="line">glm::vec3 cameraLo = glm::vec3(10.0f,0.0f,0.0f);</span><br><span class="line">glm::vec3 cameraDir = glm::vec3(1.0f,0.0f,0.0f);</span><br><span class="line"></span><br><span class="line">.........其他代码.........</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">glm::mat4 view;</span><br><span class="line">view = glm::lookAt(cameraLo,cameraLo-cameraDir, glm::vec3(0.0, 1.0, 0.0));</span><br><span class="line"></span><br><span class="line">//将镜头观察点 保持为 镜头方向位置  向上方向 设置为y轴.</span><br><span class="line"></span><br><span class="line">glUniformMatrix4fv(glGetUniformLocation(program, &quot;view&quot;), 1, GL_FALSE, glm::value_ptr(view));</span><br></pre></td></tr></table></figure>
+<p>在Display计时器中持续调用该方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">-(void)move&#123;</span><br><span class="line">    if (_isAdvance) &#123;</span><br><span class="line">        // 使摄像机 向朝向方向移动~~</span><br><span class="line">        cameraLo -=(cameraDir*(speed/24));</span><br><span class="line">    &#125;</span><br><span class="line">    if (_isback) &#123;</span><br><span class="line">        cameraLo +=(cameraDir*(speed/24));</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //改变摄像机朝向</span><br><span class="line">    if (_isLeft) &#123;</span><br><span class="line">        cameraDir = glm::normalize(glm::vec3(cameraDir[0],cameraDir[1],cameraDir[2]-rotateSpeed));</span><br><span class="line">    &#125;</span><br><span class="line">    if (_isRight) &#123;</span><br><span class="line">        cameraDir = glm::normalize(glm::vec3(cameraDir[0],cameraDir[1],cameraDir[2]+rotateSpeed));</span><br><span class="line">    &#125;</span><br><span class="line">    if (_isUp) &#123;</span><br><span class="line">        cameraDir = glm::normalize(glm::vec3(cameraDir[0],cameraDir[1]-rotateSpeed,cameraDir[2]));</span><br><span class="line">    &#125;</span><br><span class="line">    if (_isDown) &#123;</span><br><span class="line">        cameraDir = glm::normalize(glm::vec3(cameraDir[0],cameraDir[1]+rotateSpeed,cameraDir[2]));</span><br><span class="line">    &#125;</span><br><span class="line">    [self render];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="https://github.com/dearmiku/Opengl-" target="_blank" rel="external">demo地址</a></p>
+<p>最终实现效果:<br><img src="/images/OpenGL ES on iOS --- 坐标系统与矩阵转换/Socket1.gif" alt="Socket1"></p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+            <li class="next">
+                <a href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" title= OpenGL ES on iOS --- 基础光照 >
+                    <span>Next Post</span>
+                    <span>OpenGL ES on iOS --- 基础光照</span>
+                </a>
+            </li>
+        
+        
+            <li class="previous">
+                <a href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" title= OpenGL ES on iOS --- 2D纹理 >
+                    <span>Previous Post</span>
+                    <span>OpenGL ES on iOS --- 2D纹理</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#简述"><span class="toc-number">1.</span> <span class="toc-text">简述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#矩阵变换"><span class="toc-number">2.</span> <span class="toc-text">矩阵变换</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#矩阵相乘"><span class="toc-number">2.1.</span> <span class="toc-text">矩阵相乘</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缩放"><span class="toc-number">2.2.</span> <span class="toc-text">缩放</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#位移"><span class="toc-number">2.3.</span> <span class="toc-text">位移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#旋转"><span class="toc-number">2.4.</span> <span class="toc-text">旋转</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#齐次坐标"><span class="toc-number">2.5.</span> <span class="toc-text">齐次坐标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#组合"><span class="toc-number">2.6.</span> <span class="toc-text">组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#补充"><span class="toc-number">2.7.</span> <span class="toc-text">补充</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#坐标体系"><span class="toc-number">3.</span> <span class="toc-text">坐标体系</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#局部空间"><span class="toc-number">3.1.</span> <span class="toc-text">局部空间</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#世界空间"><span class="toc-number">3.2.</span> <span class="toc-text">世界空间</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#观察空间"><span class="toc-number">3.3.</span> <span class="toc-text">观察空间</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#裁剪空间"><span class="toc-number">3.4.</span> <span class="toc-text">裁剪空间</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#投影"><span class="toc-number">3.4.1.</span> <span class="toc-text">投影</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#正射投影"><span class="toc-number">3.4.1.1.</span> <span class="toc-text">正射投影</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#透视投影"><span class="toc-number">3.4.1.2.</span> <span class="toc-text">透视投影</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#组合-1"><span class="toc-number">3.5.</span> <span class="toc-text">组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#标准化设备坐标"><span class="toc-number">3.6.</span> <span class="toc-text">标准化设备坐标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模型矩阵"><span class="toc-number">3.7.</span> <span class="toc-text">模型矩阵</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#观察矩阵"><span class="toc-number">3.8.</span> <span class="toc-text">观察矩阵</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#投影矩阵"><span class="toc-number">3.9.</span> <span class="toc-text">投影矩阵</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#代码"><span class="toc-number">4.</span> <span class="toc-text">代码</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#顶点着色器"><span class="toc-number">4.1.</span> <span class="toc-text">顶点着色器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#开启深度测试"><span class="toc-number">4.2.</span> <span class="toc-text">开启深度测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模型矩阵-1"><span class="toc-number">4.3.</span> <span class="toc-text">模型矩阵</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#观察矩阵-1"><span class="toc-number">4.4.</span> <span class="toc-text">观察矩阵</span></a></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 20 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+
