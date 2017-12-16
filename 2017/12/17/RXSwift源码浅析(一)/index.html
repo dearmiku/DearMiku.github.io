@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <title>
+        
+        RXSwift源码浅析(一) · DearMiku
+        
+    </title>
+    <link rel="icon" href= /avatar/sob.jpg>
+    <!-- TODO: 在font-face加载完毕后改变字体  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+    <!-- 提前加载place holder  -->
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald-Regular';
+            src: url(/font/Oswald-Regular.ttf);
+        }
+    </style>
+    <style type="text/css">
+        .site-intro-placeholder {
+            position: absolute;
+            z-index: -2;
+            top: 0;
+            left: 0px;
+            width: calc(100% + 300px);
+            height: 100%;
+            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+            background-position: center center;
+            transform: translate3d(-226px, 0, 0);
+            animation: gradient-move 2.5s ease-out 0s 1;
+        }
+        @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+    <link rel="stylesheet" href = /css/style.css?v=20171020 />
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+    
+    <script src="/scripts/main.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">RXSwift源码浅析(一)</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            RXSwift源码浅析(一)
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-href = 第三方框架学习>第三方框架学习</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/12/17</span>
+            </div>
+        
+    </div>
+</div>
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <script>
+            var browser = {
+                    versions: function () {
+                        var u = window.navigator.userAgent;
+                        return {
+                            userAgent: u,
+                            trident: u.indexOf('Trident') > -1, //IE内核
+                            presto: u.indexOf('Presto') > -1, //opera内核
+                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+                            iPad: u.indexOf('iPad') > -1, //是否为iPad
+                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+                        };
+                    }()
+                }
+
+            function fontLoaded(){
+                console.log('font loaded');
+                if (document.getElementsByClassName('site-intro-meta')) {
+                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+                        if (postIntroTags) {
+                            postIntroTags.classList.add('post-fade-in');
+                        }
+                        if (postIntroMeat) {
+                            postIntroMeat.classList.add('post-fade-in');
+                        }
+                    }
+                }
+                
+            console.log("userAgent:" + browser.versions.userAgent);
+            // UC不支持跨域，所以直接显示
+            if (browser.versions.uc) {
+                console.log("UCBrowser");
+                fontLoaded();
+            } else {
+                WebFont.load({
+                    custom: {
+                        families: ['Oswald-Regular']
+                    },
+                    loading: function () {  //所有字体开始加载
+                        // console.log('loading');
+                    },
+                    active: function () {  //所有字体已渲染
+                        fontLoaded();
+                    },
+                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+                        console.log('inactive: timeout');
+                        fontLoaded();
+                    },
+                    timeout: 7000 // Set the timeout to two seconds
+                });
+            }
+        </script>
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="RXSwift源码浅析-一"><a href="#RXSwift源码浅析-一" class="headerlink" title="RXSwift源码浅析(一)"></a>RXSwift源码浅析(一)</h1><h1 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h1><p>最近老大给了个新项目,我打算用Swift写.原来OC用的RAC,换到Swift自然框架也想试试新的,就用了RXSwift,对于这两个框架,我都是会用,但不解其中的原理,正好最近需求没下来,就研究了研究RXSwif,把自己的收获分享一下,文中要有不准确的地方还望大家多多指正~</p>
+<p>关于RXSwift是什么和怎么用我就不废话了,网上资源很多,本文先从<strong>Observable</strong>实现原理入手,旨在以小见大,后面的<code>Single</code>什么的自然举一反三~</p>
+<h1 id="使用Demo"><a href="#使用Demo" class="headerlink" title="使用Demo"></a>使用Demo</h1><p>下面是一段简单使用<strong>Observable</strong>的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">let numbers: Observable&lt;Int&gt; = Observable.create &#123; observer -&gt; Disposable in</span><br><span class="line">    observer.onNext(0)</span><br><span class="line">    observer.onNext(1)</span><br><span class="line">    observer.onCompleted()</span><br><span class="line">    </span><br><span class="line">    return Disposables.create &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">numbers.subscribe&#123;</span><br><span class="line">    print($0)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>demo实现的效果其实就是 将上一段闭包中输入的 产生的事件(0,1,Completed),在下一段闭包中提取出来.<br>这样就将 事件的产生 和 事件的处理 分开. 本文也就是分析这个效果怎么实现的</p>
+<h1 id="主要类"><a href="#主要类" class="headerlink" title="主要类"></a>主要类</h1><h2 id="AnonymousObservable"><a href="#AnonymousObservable" class="headerlink" title="AnonymousObservable"></a>AnonymousObservable</h2><p>匿名<strong>可</strong>观察者,存储产生事件的闭包 和激活处理事件闭包的入口</p>
+<h2 id="AnyObserver"><a href="#AnyObserver" class="headerlink" title="AnyObserver"></a>AnyObserver</h2><p>任意观察者,用于存储事件 和 输出事件</p>
+<h2 id="AnonyObserver"><a href="#AnonyObserver" class="headerlink" title="AnonyObserver"></a>AnonyObserver</h2><p>匿名观察者,用于存储 处理事件的闭包</p>
+<h2 id="AnonymousObservableSink"><a href="#AnonymousObservableSink" class="headerlink" title="AnonymousObservableSink"></a>AnonymousObservableSink</h2><p>将可观察者 和 观察者 链接,实现事件的传递</p>
+<h2 id="ObserverType"><a href="#ObserverType" class="headerlink" title="ObserverType"></a>ObserverType</h2><p>协议,将上面所有内容都包裹起来,将它们加以限制,便于有效的沟通~</p>
+<h2 id="Event"><a href="#Event" class="headerlink" title="Event"></a>Event</h2><p>事件本身,是枚举,有 Error,Complete,Element(元素)</p>
+<h1 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h1><h2 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h2><p>首先要说的是 ObserverType 定义的一些内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">associatedtype E</span><br><span class="line"></span><br><span class="line">func subscribe&lt;O: ObserverType&gt;(_ observer: O) -&gt; Disposable where O.E == E</span><br></pre></td></tr></table></figure>
+<p>E:为本次事件流中定义一个确定的<strong>类型</strong>,保证 产生的和处理的元素类型相同,否则无法传递</p>
+<h3 id="create方法"><a href="#create方法" class="headerlink" title="create方法"></a>create方法</h3><p><code>Observable&lt;Int&gt;.create { observer -&gt; Disposable in ....}</code><br>对于<code>Observable</code>,它是一个抽象类,我们在实际使用中并不能使用它,在协议中有默认的实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">extension ObservableType &#123;</span><br><span class="line">    public static func create(_ subscribe: @escaping (AnyObserver&lt;E&gt;) -&gt; Disposable) -&gt; Observable&lt;E&gt; &#123;</span><br><span class="line">        return AnonymousObservable(subscribe)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以此处创建的是 <code>AnonymousObservable</code> 对象,我先称其为<strong>A1</strong>,<strong>A1</strong>将事件产生的闭包持有, 闭包中产生的事件 输入到<code>AnyObserver</code>结构体中.闭包我们成为<strong>A2</strong> 这样 存储部分就好了~~</p>
+<h1 id="激活"><a href="#激活" class="headerlink" title="激活"></a>激活</h1><p>激活 我们通过调用<strong>A1</strong>的订阅方法<code>subscribe</code>(也是协议中限定的方法),接下来看方法中的实现~<br>因为<code>Observable</code>是抽象类,所以这里也是协议默认的实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public func subscribe(_ on: @escaping (Event&lt;E&gt;) -&gt; Void)</span><br><span class="line">    -&gt; Disposable &#123;</span><br><span class="line">        let observer = AnonymousObserver &#123; e in</span><br><span class="line">            on(e)       </span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return self.asObservable().subscribe(observer)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这里就分两步了,一是观察者的实现,而是事件的传递</p>
+<h2 id="观察者"><a href="#观察者" class="headerlink" title="观察者"></a>观察者</h2><p>在这里很简单,也就是创建<code>AnonymousObserver</code>匿名观察者对象<strong>B1</strong>,<strong>B1</strong>将事件处理闭包持有,闭包我们成为<strong>B2</strong></p>
+<h2 id="传递"><a href="#传递" class="headerlink" title="传递"></a>传递</h2><p>首先是<code>asObservable()</code>方法,因为 B1间接继承自<code>Observable</code>,所以也就是<code>return self</code>,应该是在处理其他类型的可观察物用到,在后续 如果碰到我会补充~</p>
+<p>然后就是对<strong>A1</strong>的 另一个订阅方法(重载),将<strong>B1</strong>作为参数传入<br>细枝末节先不说,先把握主干~</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">override func subscribe&lt;O : ObserverType&gt;(_ observer: O) -&gt; Disposable where O.E == Element &#123;</span><br><span class="line">    </span><br><span class="line">    if !CurrentThreadScheduler.isScheduleRequired &#123;</span><br><span class="line">        //第一步</span><br><span class="line">        let disposer = SinkDisposer()</span><br><span class="line">        //第二步</span><br><span class="line">        let sinkAndSubscription = run(observer, cancel: disposer)</span><br><span class="line">        //第三步</span><br><span class="line">        disposer.setSinkAndSubscription(sink: sinkAndSubscription.sink, subscription: sinkAndSubscription.subscription)</span><br><span class="line">        return disposer</span><br><span class="line">    &#125;</span><br><span class="line">    //else先不说~</span><br><span class="line">    else &#123;</span><br><span class="line">        return CurrentThreadScheduler.instance.schedule(()) &#123; _ in</span><br><span class="line">            let disposer = SinkDisposer()</span><br><span class="line">            let sinkAndSubscription = self.run(observer, cancel: disposer)</span><br><span class="line">            disposer.setSinkAndSubscription(sink: sinkAndSubscription.sink, subscription: sinkAndSubscription.subscription)</span><br><span class="line"></span><br><span class="line">            return disposer</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h3><p><code>SinkDisposer</code>对象是关于 传递结束后,处理资源回收的对象,叫它<strong>C1</strong>,用来处理 <strong>A1</strong>create闭包返回的disposer闭包的~</p>
+<h3 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h3><p>调用了<code>run</code>方法,将<strong>B1</strong>对象传入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">override func run&lt;O : ObserverType&gt;(_ observer: O, cancel: Cancelable) -&gt; (sink: Disposable, subscription: Disposable) where O.E == Element &#123;</span><br><span class="line">    //2.1  </span><br><span class="line">    let sink = AnonymousObservableSink(observer: observer, cancel: cancel)</span><br><span class="line">    //2.2</span><br><span class="line">    let subscription = sink.run(self)</span><br><span class="line">    //2.3</span><br><span class="line">    return (sink: sink, subscription: subscription)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-1步"><a href="#2-1步" class="headerlink" title="2.1步"></a>2.1步</h4><p>创建<strong>AnonymousObservableSink</strong>对象,我称它<strong>D1</strong>,它也是将<strong>B1</strong>对象和<strong>C1</strong>对象持有</p>
+<h4 id="2-2步"><a href="#2-2步" class="headerlink" title="2.2步"></a>2.2步</h4><p>调用<strong>D1</strong>对象的<code>run</code>方法,将<strong>A1</strong>自身传入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">func run(_ parent: Parent) -&gt; Disposable &#123;</span><br><span class="line">       return parent._subscribeHandler(AnyObserver(self))</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>在该方法中,就是将<strong>A1</strong>对象的<strong>A2</strong>闭包 调用,将<strong>D1</strong>对象化为<code>AnyObserver</code>结构体作为<strong>A2</strong>参数传入~</p>
+<p>然后我们看  <strong>D1</strong>对象 若何转换的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//结构体方法</span><br><span class="line">public init&lt;O : ObserverType&gt;(_ observer: O) where O.E == Element &#123;</span><br><span class="line">    self.observer = observer.on</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这里结构体 将 <strong>D1</strong>持有的<strong>B1</strong>对象的on方法 作为属性持有~,将结构体成为<strong>E1</strong></p>
+<p>再来看<strong>E1</strong>的<code>onNext....</code>方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">extension ObserverType &#123;</span><br><span class="line">    //YSD</span><br><span class="line">    /// Convenience method equivalent to `on(.next(element: E))`</span><br><span class="line">    ///</span><br><span class="line">    /// - parameter element: Next element to send to observer(s)</span><br><span class="line">    public func onNext(_ element: E) &#123;</span><br><span class="line">        on(.next(element))</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    /// Convenience method equivalent to `on(.completed)`</span><br><span class="line">    public func onCompleted() &#123;</span><br><span class="line">        on(.completed)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    /// Convenience method equivalent to `on(.error(Swift.Error))`</span><br><span class="line">    /// - parameter error: Swift.Error to send to observer(s)</span><br><span class="line">    public func onError(_ error: Swift.Error) &#123;</span><br><span class="line">        on(.error(error))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对应的其实是调用 <strong>B1</strong>的<code>on</code>方法~~</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">func on(_ event: Event&lt;E&gt;) &#123;</span><br><span class="line">    switch event &#123;                      </span><br><span class="line">    case .next:</span><br><span class="line">        if _isStopped == 0 &#123;            </span><br><span class="line">            onCore(event)</span><br><span class="line">        &#125;</span><br><span class="line">    case .error, .completed:</span><br><span class="line"></span><br><span class="line">        if AtomicCompareAndSwap(0, 1, &amp;_isStopped) &#123;</span><br><span class="line">            onCore(event)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对应的<strong>B1</strong>的<code>onCore</code>方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">override func onCore(_ event: Event&lt;Element&gt;) &#123;</span><br><span class="line">    return _eventHandler(event)         </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>也就是将 <strong>E1</strong>从<strong>A2</strong>接收的事件 传入<strong>B2</strong>中,最终实现内容的传递~~ 然后再将<strong>A1</strong>中释放资源的闭包返回~</p>
+<h4 id="2-3"><a href="#2-3" class="headerlink" title="2.3"></a>2.3</h4><p>将<strong>D1</strong>和disposable闭包 作为元组返回~</p>
+<h3 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h3><p><strong>C1</strong>接收元组参数,调用<code>setSinkAndSubscription</code>方法~,然后将<strong>SinkDisposer</strong>对象返回,让用户选择是否释放~</p>
+<h1 id="图示"><a href="#图示" class="headerlink" title="图示"></a>图示</h1><p>文字太抽象,画个图吧~ 画的有点丑(๑•ᴗ•๑)~</p>
+<p><img src="/images/RXSwift源码浅析一/screenshot.png" alt="screenshot"></p>
+<p>可以看到 A1 在这个过程中只持有了A2, 不会导致内存泄露~ 当然如果你dispose 使用不当 肯定有泄漏的~ 亲测(๑•ᴗ•๑)~</p>
+<h1 id="细枝末节"><a href="#细枝末节" class="headerlink" title="细枝末节"></a>细枝末节</h1><h2 id="1"><a href="#1" class="headerlink" title="1"></a>1</h2><p>订阅2中的<code>if !CurrentThreadScheduler.isScheduleRequired</code></p>
+<p>内容是这样的~</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public static fileprivate(set) var isScheduleRequired: Bool &#123;</span><br><span class="line">    get &#123;     </span><br><span class="line">        //获取该指示值</span><br><span class="line">        return pthread_getspecific(CurrentThreadScheduler.isScheduleRequiredKey) == nil</span><br><span class="line">    &#125;</span><br><span class="line">    set(isScheduleRequired) &#123;</span><br><span class="line">        </span><br><span class="line">        //设置</span><br><span class="line">        //http://www.jianshu.com/p/d52c1ebf808a</span><br><span class="line">        // 成功返回0            true设置no no设置为 true</span><br><span class="line">        if pthread_setspecific(CurrentThreadScheduler.isScheduleRequiredKey, isScheduleRequired ? nil : scheduleInProgressSentinel) != 0 &#123;</span><br><span class="line">            rxFatalError(&quot;pthread_setspecific failed&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private static var isScheduleRequiredKey: pthread_key_t = &#123; () -&gt; pthread_key_t in</span><br><span class="line">    //YSD</span><br><span class="line">    //https://onevcat.com/2015/01/swift-pointer/</span><br><span class="line">    //可变指针 pthread_key_t类型 分配空间</span><br><span class="line">    let key = UnsafeMutablePointer&lt;pthread_key_t&gt;.allocate(capacity: 1)</span><br><span class="line">    defer &#123;</span><br><span class="line">        key.deallocate(capacity: 1)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //创建线程安全的变量</span><br><span class="line">    guard pthread_key_create(key, nil) == 0 else &#123;</span><br><span class="line">        rxFatalError(&quot;isScheduleRequired key creation failed&quot;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return key.pointee</span><br><span class="line">&#125;()</span><br></pre></td></tr></table></figure>
+<p>这里应该是为了保护,RXSwift在多线程操作下的数据安全~ 在本次事件流中只使用了get方法,并没使用set~,所以具体效果我不清楚~,以后碰到了 我在补充上吧~</p>
+<h2 id="SinkDisposer"><a href="#SinkDisposer" class="headerlink" title="SinkDisposer"></a>SinkDisposer</h2><p>就是释放资源部分~<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">   fileprivate enum DisposeState: UInt32 &#123;     </span><br><span class="line">       case disposed = 1</span><br><span class="line">       case sinkAndSubscriptionSet = 2</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   // Jeej, swift API consistency rules    </span><br><span class="line">   fileprivate enum DisposeStateInt32: Int32 &#123;</span><br><span class="line">       case disposed = 1</span><br><span class="line">       case sinkAndSubscriptionSet = 2</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   private var _state: AtomicInt = 0</span><br><span class="line">   private var _sink: Disposable? = nil</span><br><span class="line">   private var _subscription: Disposable? = nil</span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line">func setSinkAndSubscription(sink: Disposable, subscription: Disposable) &#123;</span><br><span class="line">       _sink = sink</span><br><span class="line">       _subscription = subscription</span><br><span class="line"></span><br><span class="line">       let previousState = AtomicOr(DisposeState.sinkAndSubscriptionSet.rawValue, &amp;_state)</span><br><span class="line">       if (previousState &amp; DisposeStateInt32.sinkAndSubscriptionSet.rawValue) != 0 &#123;</span><br><span class="line">           rxFatalError(&quot;Sink and subscription were already set&quot;)</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       if (previousState &amp; DisposeStateInt32.disposed.rawValue) != 0 &#123;</span><br><span class="line">           sink.dispose()</span><br><span class="line">           subscription.dispose()</span><br><span class="line">           _sink = nil</span><br><span class="line">           _subscription = nil</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   func dispose() &#123;</span><br><span class="line">       let previousState = AtomicOr(DisposeState.disposed.rawValue, &amp;_state)</span><br><span class="line"></span><br><span class="line">       if (previousState &amp; DisposeStateInt32.disposed.rawValue) != 0 &#123;</span><br><span class="line">           return</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       if (previousState &amp; DisposeStateInt32.sinkAndSubscriptionSet.rawValue) != 0 &#123;</span><br><span class="line">           guard let sink = _sink else &#123;</span><br><span class="line">               rxFatalError(&quot;Sink not set&quot;)</span><br><span class="line">           &#125;</span><br><span class="line">           guard let subscription = _subscription else &#123;</span><br><span class="line">               rxFatalError(&quot;Subscription not set&quot;)</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           sink.dispose()</span><br><span class="line">           subscription.dispose()</span><br><span class="line"></span><br><span class="line">           _sink = nil</span><br><span class="line">           _subscription = nil</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>从输出崩溃提示哪里就可以得知~ 这里是为了防止dispose的多次调用~ 因为在整个事件流中,dipose闭包 可能是 产生Complete,Error或者用户手动调用的~ </p>
+<p><code>AtomicOr</code>方法其实调用的是<code>OSAtomicOr32OrigBarrier(A,&amp;B)</code> 该函数会将两个变量 线程安全的 按位或运算返回结果, 并为后者赋值=前者~ B=A</p>
+<blockquote>
+<p>未调用dipose时 逻辑与运算  state = 2 previousState = 0 两个条件都不成立~ 所以此时是用户要手动dispose</p>
+<p>之前调用过 也就是发生complete 或 Error(在上面的代码中也有保证,两者只发生一起~),则 state = 1当调用setSinkAndSubscription方法时 逻辑与运算 state = 2 previousState = 1 则第一个条件不成立 第二个成立~ 释放资源</p>
+<p>当多次Complete时,则只会dipose一次~</p>
+<p>当在外界多次调用时 则state = 2 previousState = 1 则第一个条件成立 崩溃~</p>
+</blockquote>
+<p>当然这里实现这种效果的方案有很多种~ RSSwift的方案比较有逼格吧~</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>看完这些源码,我的感觉是RXSwift对 设计模式 贯彻的很彻底~ 在时间富裕的情况下自己写的项目要向他靠拢,增强项目的延展性,这样项目经理让加啥也不会太头疼了~~</p>
+
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+        
+            <li class="previous">
+                <a href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" title= OpenGL ES on iOS --- 光照进阶 >
+                    <span>Previous Post</span>
+                    <span>OpenGL ES on iOS --- 光照进阶</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper">
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#RXSwift源码浅析-一"><span class="toc-number">1.</span> <span class="toc-text">RXSwift源码浅析(一)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#简述"><span class="toc-number">2.</span> <span class="toc-text">简述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用Demo"><span class="toc-number">3.</span> <span class="toc-text">使用Demo</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#主要类"><span class="toc-number">4.</span> <span class="toc-text">主要类</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#AnonymousObservable"><span class="toc-number">4.1.</span> <span class="toc-text">AnonymousObservable</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AnyObserver"><span class="toc-number">4.2.</span> <span class="toc-text">AnyObserver</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AnonyObserver"><span class="toc-number">4.3.</span> <span class="toc-text">AnonyObserver</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AnonymousObservableSink"><span class="toc-number">4.4.</span> <span class="toc-text">AnonymousObservableSink</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ObserverType"><span class="toc-number">4.5.</span> <span class="toc-text">ObserverType</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Event"><span class="toc-number">4.6.</span> <span class="toc-text">Event</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#实现过程"><span class="toc-number">5.</span> <span class="toc-text">实现过程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#存储"><span class="toc-number">5.1.</span> <span class="toc-text">存储</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#create方法"><span class="toc-number">5.1.1.</span> <span class="toc-text">create方法</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#激活"><span class="toc-number">6.</span> <span class="toc-text">激活</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#观察者"><span class="toc-number">6.1.</span> <span class="toc-text">观察者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#传递"><span class="toc-number">6.2.</span> <span class="toc-text">传递</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#第一步"><span class="toc-number">6.2.1.</span> <span class="toc-text">第一步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第二步"><span class="toc-number">6.2.2.</span> <span class="toc-text">第二步</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1步"><span class="toc-number">6.2.2.1.</span> <span class="toc-text">2.1步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2步"><span class="toc-number">6.2.2.2.</span> <span class="toc-text">2.2步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3"><span class="toc-number">6.2.2.3.</span> <span class="toc-text">2.3</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第三步"><span class="toc-number">6.2.3.</span> <span class="toc-text">第三步</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#图示"><span class="toc-number">7.</span> <span class="toc-text">图示</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#细枝末节"><span class="toc-number">8.</span> <span class="toc-text">细枝末节</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1"><span class="toc-number">8.1.</span> <span class="toc-text">1</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SinkDisposer"><span class="toc-number">8.2.</span> <span class="toc-text">SinkDisposer</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">9.</span> <span class="toc-text">总结</span></a></li></ol>
+    </div>
+    
+    <div class="back-top">&#xe639;</div>
+    <div class="sidebar">
+    <div class="sidebar-header sidebar-header-show-archive">
+        <div class="sidebar-category">
+            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
+            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
+        </div>
+    </div>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-archive">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 21 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/17</span><a class="archive-post-title" href= "/2017/12/17/RXSwift源码浅析(一)/" >RXSwift源码浅析(一)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+    
+        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+    
+    </div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #888; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tag-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var jsInfo = {
+        root: '/'
+    }
+</script>
+    <!-- 不蒜子  -->
+    
+    <!-- CNZZ统计  -->
+    
+    </div>
+    </body>
+</html>
+
+
