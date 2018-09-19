@@ -1,37 +1,70 @@
 <!DOCTYPE html>
-<html>
-    <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
-    <title>
-        
-        DearMiku
-        
-    </title>
-    <link rel="icon" href= /avatar/sob.jpg>
-    <!-- TODO: 在font-face加载完毕后改变字体  -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
-    <!-- 提前加载place holder  -->
+<html lang="zh-tw">
+    <!-- title -->
+
+
+
+
+<!-- keywords -->
+
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" >
+    <meta name="author" content="杨尚达">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="杨尚达">
+    
+    <meta name="keywords" content="DearMiku,杨尚达">
+    
+    <meta name="description" content="技术分享与生活日常">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>DearMiku</title>
     <style type="text/css">
-        @font-face {
-            font-family: 'Oswald-Regular';
-            src: url(/font/Oswald-Regular.ttf);
-        }
-    </style>
-    <style type="text/css">
-        .site-intro-placeholder {
-            position: absolute;
-            z-index: -2;
-            top: 0;
-            left: 0px;
-            width: calc(100% + 300px);
-            height: 100%;
-            background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
-            background-position: center center;
-            transform: translate3d(-226px, 0, 0);
-            animation: gradient-move 2.5s ease-out 0s 1;
-        }
-        @keyframes gradient-move {
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
         0% {
             transform: translate3d(-226px, 0, 0);
         }
@@ -39,32 +72,160 @@
             transform: translate3d(0, 0, 0);
         }
     }
+
 </style>
-    <link rel="stylesheet" href = /css/style.css?v=20171020 />
-    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.min.js" defer></script>
+
+    <link rel="preload" href= "/css/style.css?v=20180824" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <link rel="stylesheet" href= "/css/mobile.css?v=20180824" media="(max-width: 980px)">
     
-    <script src="/scripts/main.js" defer></script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href= "/avatar/sob.jpg" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script" />
+    <link rel="preload" href="/scripts/main.js" as="script" />
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
     <!-- 百度统计  -->
     
     <!-- 谷歌统计  -->
     
 </head>
+
     
     
 <header class="header">
 
+    <div class="read-progress"></div>
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
     
     <a class="home-link" href=/>DearMiku</a>
 </header>
     <div class="wrapper">
-        <div class="site-intro">
+        <div class="site-intro" style="
+
+
+
+
+
+
+">
     
     <!-- 主页  -->
             
-    <div class="site-intro-img" style="background-image: url(/)"></div>
     <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
@@ -80,366 +241,439 @@
         
     </div>
 </div>
-        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <script>
-            var browser = {
-                    versions: function () {
-                        var u = window.navigator.userAgent;
-                        return {
-                            userAgent: u,
-                            trident: u.indexOf('Trident') > -1, //IE内核
-                            presto: u.indexOf('Presto') > -1, //opera内核
-                            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
-                            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
-                            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
-                            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
-                            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
-                            iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
-                            iPad: u.indexOf('iPad') > -1, //是否为iPad
-                            webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
-                            weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
-                            uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
-                        };
-                    }()
-                }
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
 
-            function fontLoaded(){
-                console.log('font loaded');
-                if (document.getElementsByClassName('site-intro-meta')) {
-                    document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
-                    document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
-                    var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
-                        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
-                        if (postIntroTags) {
-                            postIntroTags.classList.add('post-fade-in');
-                        }
-                        if (postIntroMeat) {
-                            postIntroMeat.classList.add('post-fade-in');
-                        }
-                    }
-                }
-                
-            console.log("userAgent:" + browser.versions.userAgent);
-            // UC不支持跨域，所以直接显示
-            if (browser.versions.uc) {
-                console.log("UCBrowser");
-                fontLoaded();
-            } else {
-                WebFont.load({
-                    custom: {
-                        families: ['Oswald-Regular']
-                    },
-                    loading: function () {  //所有字体开始加载
-                        // console.log('loading');
-                    },
-                    active: function () {  //所有字体已渲染
-                        fontLoaded();
-                    },
-                    inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
-                        console.log('inactive: timeout');
-                        fontLoaded();
-                    },
-                    timeout: 7000 // Set the timeout to two seconds
-                });
-            }
-        </script>
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
             <main class="main index-page">
     
     
     
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/12/17/RXSwift源码浅析(一)/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>RXSwift源码浅析(一)</span>
-                    </h2>
-                <div class="abstract-content">
-                    RXSwift源码浅析(一)简述最近老大给了个新项目,我打算用Swift写.原来OC用的RAC,换到Swift自然框架也想试试新的,就用了RXSwift,对于这两个框架,我都是会用,但不解其中的...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
     
-        <a class="post-tag" href="javascript:void(0);" data-href = 第三方框架学习>第三方框架学习</a>
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2018/09/19/Flask + Gunicorn + Nginx 部署/" >
+            
+                <span>Flask + Gunicorn + Nginx 部署</span>
+        </a>
+        <div class="abstract-content">
+            Flask + Gunicorn + Nginx 部署前言本文记录我AWS上部署Flask服务器的过程~ 希望能帮到有需要的人, 由于本人水平有限,难免有错误与遗漏的地方~ 还请大家多多指正~ (๑•ᴗ•๑)
+框架简介Gunicorn这里就要先说到WSGI,它是一个协议,定义与协调Python程序与请求之间的接口,常用的WSGI容器有Gunicorn和uWSGI,Gunicorn更加快捷,所以选择Gunicorn
+FlaskFlask是一个基于Python的Web开发微框架,借助Web框架,我们就不用关心请求,响应这些底层的实现,而专注于业务的实现~ 而Flask相比于其他框架更加轻量,...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/09/19</span>
+            </div>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Python">Python</a>
     
 </div>
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/12/17</span>
-                </div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2018/09/07/Python学习协程asyncio/" >
+            
+                <span>Python学习--协程--asyncio</span>
+        </a>
+        <div class="abstract-content">
+            Python学习–协程–asyncio简介协程是一种用户态的轻量级线程，协程的调度完全由用户控制。协程拥有自己的寄存器上下文和栈。
+协程调度切换时，将寄存器上下文和栈保存到其他地方，在切回来的时候，恢复先前保存的寄存器上下文和栈，直接操作栈则基本没有内核切换的开销，可以不加锁的访问全局变量，所以上下文的切换非常快。
+本人也是刚刚开始学习Python,难免有错误与疏漏还望多多指正~(づ￣3￣)づ╭❤～
+知乎上关于协程的一个问题~
+关于asyncio理解的博客
+语法协程函数在函数前加async前缀,则表示该函数为协程函数~
+123import asyncioasync def corouti...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/09/07</span>
             </div>
-        </article>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
     
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>OpenGL ES on iOS --- 光照进阶</span>
-                    </h2>
-                <div class="abstract-content">
-                    简述本文记录我记录我学习 坐标体系和矩阵转换的过程,加深学习便于后续查询,可能有些描述不够准确,或者内容不够充实,还请多多指正,共同学习.
-光源分类在基础光照时,学习了光照对物体的作用,也就相当...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Python">Python</a>
     
 </div>
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/12/06</span>
-                </div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2018/04/10/HandyJSON实现方案浅析/" >
+            
+                <span>HandyJSON实现方案浅析</span>
+        </a>
+        <div class="abstract-content">
+            HandyJSON实现方案浅析简述近日,由于Swift升级,导致一段时间HandyJSON无法使用,借这个机会将HandyJSON好好学习了一下~ 然后从另一种方式实现了类似OC的KVC效果的一个小Demo,通过本文记录一些自己的收获,旨在抛砖引玉,有错误的地方还请多多指正 ~ (๑•ᴗ•๑)
+好了,下面先从Swift的类型结构开始谈起吧~
+MetaDateSwift在运行时为程序中的每个类型都保留了元数据用于记录(类比OC的元类),包括每个泛型类型的实例.这些数据都是由编译器静态生成,且每种类型都有唯一的元数据记录.元数据在运行时根据需要进行延迟创建~ MetaData的信息 就存储在...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/04/10</span>
             </div>
-        </article>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
     
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>OpenGL ES on iOS --- 基础光照</span>
-                    </h2>
-                <div class="abstract-content">
-                    简述本文记录我记录我学习 坐标体系和矩阵转换的过程,加深学习便于后续查询,可能有些描述不够准确,或者内容不够充实,还请多多指正,共同学习.
-颜色一个没有Alpha通道的颜色可以用一个3维向量来表...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "第三方框架学习">第三方框架学习</a>
     
 </div>
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/12/05</span>
-                </div>
-            </div>
-        </article>
+            
+        </div>
+    </article>
     
     
     
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>OpenGL ES on iOS --- 坐标系统与矩阵转换</span>
-                    </h2>
-                <div class="abstract-content">
-                    简述本文记录我记录我学习 坐标体系和矩阵转换的过程,加深学习便于后续查询,可能有些描述不够准确,或者内容不够充实,还请多多指正,共同学习
-矩阵变换我们将物体坐标进行一系列变换,达到自己期望的位置...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
-    
-</div>
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/12/01</span>
-                </div>
-            </div>
-        </article>
     
     
     
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>OpenGL ES on iOS --- 2D纹理</span>
-                    </h2>
-                <div class="abstract-content">
-                    简介纹理是用来丰富我们绘制物体细节的,它可以是一张2D图片(除了图像外,纹理也被用来存储大量数据,传递到着色器上),就像贴图一样贴在绘制的物体上.
-纹理属性纹理坐标为了将纹理映射到绘制的物体上,...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
-    
-</div>
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/11/29</span>
-                </div>
-            </div>
-        </article>
-    
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</span>
-                    </h2>
-                <div class="abstract-content">
-                    简介Uniform是一种从CPU中的应用向GPU中的着色器发送数据的方式，但uniform和顶点属性有些不同。
+    <article class="index-post">
+        <a class="abstract-title" href = "/2018/02/22/兼容iOS与OSX的轻量级富文本处理Label (自己造的小轮子)/" >
+            
+                <span>MK_Text富文本处理Lable 兼容iOS和OSX</span>
+        </a>
+        <div class="abstract-content">
+            简述最近开发的OSX应用时,一些地方需要用到图文混排,与可点击文字的地方,这时我就特别怀念在iOS用的YYText,然后转念一想,反正快过年了时间比较富裕就自己造一个轮子吧,所以就写了MK_Text
+目前就完成了YYLabel的大部分功能,但基本够用了,后续我也会去丰富里面的功能,大家有什么想法也可以提,如果我觉得比较实用我也会尽力去实现的~  接下来我就介绍下MK_Text吧~
+介绍github链接:MK_Text   
+特性
+支持图文混排,支持富文本与View混排
+支持异步排版渲染
+支持高亮文字设置
+支持OSX 与 iOS
+支持自动布局
 
-首先，uniform是全局的(Global)。全局意味着uniform变量必须在...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
+用法图文混排可自定义图片显示大小,默认显示图...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/02/22</span>
+            </div>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
     
-        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "开源">开源</a>
     
 </div>
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/11/28</span>
-                </div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2017/12/29/Mac开发---NSDocument/" >
+            
+                <span>Mac开发---NSDocument</span>
+        </a>
+        <div class="abstract-content">
+            Mac开发—NSDocument简述最近在写的App是这种这种类型的,总结了总结,写了这篇博文,本文旨在介绍如何实现 基于文档的Mac App 若有描述不准确或错误的地方 还望多多指正,共同学习(๑•ᴗ•๑)
+实现的效果也就是 在文档的打开方式中有自己的App可选,将文件拖拽至Dock栏中可以打开~
+NSDocumentNSDocument类相当于一层封装~ ,类似于UIImage,无论是jpg格式还是png格式都以UIImage对象进行调用~
+NSDocument则不仅可以对外持有 文档数据, 对内可以绑定 窗口控制器~.当打开文档时自动创建并展示与其绑定的窗口控制器~
+Xcode提供...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/12/29</span>
             </div>
-        </article>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
     
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>Opengl ES 3.0 on iOS -- EAGLContext</span>
-                    </h2>
-                <div class="abstract-content">
-                    概述EAGLContext对象是管理OpenGL ES渲染上下文,若想使用OpenGL ES 进行绘制工作,则必须一个上下文对象.
-API初始化12- (nullable instancetyp...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Mac开发">Mac开发</a>
     
 </div>
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/11/27</span>
-                </div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2017/12/25/OpenGL ES on iOS --- Assimp/" >
+            
+                <span>OpenGL ES on iOS --- Assimp</span>
+        </a>
+        <div class="abstract-content">
+            OpenGL ES on iOS — Assimp简述本文主要记录 Assimp库的编译和使用,可能会有不准确的地方,还望多多指正共同学习~
+Assimp是Open Asset Import Library（开放的资产导入库）的缩写。Assimp能够导入很多种不同的模型文件格式（并也能够导出部分的格式），它会将所有的模型数据加载至Assimp的通用数据结构中
+Assimp编译这里是库的github地址Assimp,下载下来 我们还要编译成iOS可用的库(这里踩坑不少/(ㄒoㄒ)/~~)
+配置CMAKE环境CMake是个开源的跨平台自动化建构系统,想要编译Assimp 先要配置好它~ CM...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/12/25</span>
             </div>
-        </article>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
     
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</span>
-                    </h2>
-                <div class="abstract-content">
-                    简介本文记录了我初学Opengl 绘制彩色矩形的过程,可能我对内容的描述不够准确,还请多多指正
-实现配置图层123+(Class)layerClass&#123;    return [CAEA...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-href = Opengl ES>Opengl ES</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Opengl ES">Opengl ES</a>
     
 </div>
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/11/27</span>
-                </div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2017/12/19/RXSwift 源码浅析(二)/" >
+            
+                <span>RXSwift源码浅析(二)</span>
+        </a>
+        <div class="abstract-content">
+            RXSwift 源码浅析(二)简述本文是对上一篇文章的补充,加上对KVO实现的简要分析 和 自己的一些思考,可能会有不够准确的地方还望多多指正,共同学习~~
+框架结构在上篇文章中是从具体实现的角度分析Observable的使用实现,接下来从一个高一点的角度来分析RXSwift.
+效果无论是Observable,还是KVO,通知,按钮点击….,在本质上我认为可将这一切看为这样一个过程~
+以通知为例子, 在程序中某个地方发出了事件(例如键盘弹出),这就是事件源. 然后这个事件传递(系统发出键盘弹出的通知). 最后程序的某处响应了这个事件(比如我们监听到这个通知,然后将控件上移). 我认为RX...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/12/19</span>
             </div>
-        </article>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
     
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/11/23/YYAsyncLayer 学习/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>YYAsyncLayer 学习</span>
-                    </h2>
-                <div class="abstract-content">
-                    YYAsyncLayer 学习简介YYAsyncLayer是用于图层异步绘制的一个组件,将耗时操作(如文本布局计算)放在RunLoop空闲时去做,进而减少卡顿.
-组件内容YYAsyncLayer...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-href = 第三方框架学习>第三方框架学习</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "第三方框架学习">第三方框架学习</a>
     
 </div>
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/11/23</span>
-                </div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2017/12/17/RXSwift源码浅析(一)/" >
+            
+                <span>RXSwift源码浅析(一)</span>
+        </a>
+        <div class="abstract-content">
+            RXSwift源码浅析(一)简述最近老大给了个新项目,我打算用Swift写.原来OC用的RAC,换到Swift自然框架也想试试新的,就用了RXSwift,对于这两个框架,我都是会用,但不解其中的原理,正好最近需求没下来,就研究了研究RXSwif,把自己的收获分享一下,文中要有不准确的地方还望大家多多指正~
+关于RXSwift是什么和怎么用我就不废话了,网上资源很多,本文先从Observable实现原理入手,旨在以小见大,后面的Single什么的自然举一反三~
+使用Demo下面是一段简单使用Observable的代码
+123456789101112let numbers: Observab...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/12/17</span>
             </div>
-        </article>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
     
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>iOS进程信息 -- NSProgressInfo</span>
-                    </h2>
-                <div class="abstract-content">
-                    iOS进程信息 – NSProgressInfo NSProcessInfo *processInfo = [NSProcessInfo processInfo];  
-//获取运行该进程的参数...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-href = iOS基础>iOS基础</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "第三方框架学习">第三方框架学习</a>
     
 </div>
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/11/22</span>
-                </div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >
+            
+                <span>OpenGL ES on iOS --- 光照进阶</span>
+        </a>
+        <div class="abstract-content">
+            简述本文记录我记录我学习 坐标体系和矩阵转换的过程,加深学习便于后续查询,可能有些描述不够准确,或者内容不够充实,还请多多指正,共同学习.
+光源分类在基础光照时,学习了光照对物体的作用,也就相当于物体的材质,这次主要说 现实生活中的光源
+平行光当光源无限远时,从其发射过来的的光可以近似的看做平行光(例如太阳);这时 光线的方向都是一致的.
+1234567891011121314151617181920212223242526272829303132float ambientStrength = 0.3;    //环境因子   float specularStrength = 2.0; ...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/12/06</span>
             </div>
-        </article>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Opengl ES">Opengl ES</a>
+    
+</div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >
+            
+                <span>OpenGL ES on iOS --- 基础光照</span>
+        </a>
+        <div class="abstract-content">
+            简述本文记录我记录我学习 坐标体系和矩阵转换的过程,加深学习便于后续查询,可能有些描述不够准确,或者内容不够充实,还请多多指正,共同学习.
+颜色一个没有Alpha通道的颜色可以用一个3维向量来表示 例如 glm::vec3(1.0,1.0,1.0); 表示白色.
+在现实世界中,一个物体的颜色是它反射的颜色导致的, 例如我们将纯红光 照射在纯绿物体上, 因为红光都被吸收,所以显示为黑色.
+将吸收反射的过程用向量表示出来
+123glm::vec3 lightColor(0.0f, 1.0f, 0.0f); //绿色光源向量glm::vec3 objColor(1.0f, 0.5f, 0.31...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/12/05</span>
+            </div>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Opengl ES">Opengl ES</a>
+    
+</div>
+            
+        </div>
+    </article>
     
     <!-- paginator  -->
     
     <nav class="page-nav">
-        <span class="page-number current">1</span><a class="page-number" href="/archives/page/2/">2</a><a class="page-number" href="/archives/page/3/">3</a><a class="extend next" rel="next" href="/archives/page/2/">#NEXT</a>
+        <span class="page-number current">1</span><a class="page-number" href="/archives/page/2/">2</a><a class="page-number" href="/archives/page/3/">3</a><a class="extend next" rel="next" href="/archives/page/2/">NEXT &#62;</a>
     </nav>
     
 </main>
@@ -460,13 +694,25 @@ API初始化12- (nullable instancetyp...
     
         
             
-                <a href="https://gitee.com/DearMiku" class="iconfont-archer github" target="_blank" title="github"></a>
+                <a href="https://github.com/dearmiku" class="iconfont-archer github" target="_blank" title=github></a>
             
         
     
         
             
-                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+                <a href="//weibo.com/5232876666/profile?rightmod=1&wvr=6&mod=personinfo" class="iconfont-archer weibo" target="_blank" title=weibo></a>
+            
+        
+    
+        
+            
+                <a href="//juejin.im/user/5a040a8751882529d7760823" class="iconfont-archer juejin" target="_blank" title=juejin></a>
+            
+        
+    
+        
+            
+                <a href="//space.bilibili.com/2035239/#/" class="iconfont-archer bilibili" target="_blank" title=bilibili></a>
             
         
     
@@ -475,24 +721,30 @@ API初始化12- (nullable instancetyp...
     
     <!-- powered by Hexo  -->
     <div class="copyright">
-        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">Theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">archer</a></span>
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
     </div>
     <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+    
+    </div>
     
 </footer>
     </div>
     <!-- toc -->
     
-    <div class="back-top">&#xe639;</div>
-    <div class="sidebar">
-    <div class="sidebar-header sidebar-header-show-archive">
-        <div class="sidebar-category">
-            <span class="sidebar-archive-link"><span class="iconfont-archer">&#xe67d;</span>Archive</span>
-            <span class="sidebar-tags-link"><span class="iconfont-archer">&#xe610;</span>Tag</span>
-        </div>
-    </div>
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
     <div class="sidebar-content sidebar-content-show-archive">
-          <div class="sidebar-archive">
+          <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
     
     
@@ -751,15 +1003,174 @@ API初始化12- (nullable instancetyp...
     
     
     
-    <div class="total-archive"> Total : 21 </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 28
+        </div>
+        <!-- search  -->
+        
+    </div>
     
     <div class="post-archive">
     
     
     
     
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span><a class="archive-post-title" href= "/2018/09/19/Flask + Gunicorn + Nginx 部署/" >Flask + Gunicorn + Nginx 部署</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/07</span><a class="archive-post-title" href= "/2018/09/07/Python学习协程asyncio/" >Python学习--协程--asyncio</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/10</span><a class="archive-post-title" href= "/2018/04/10/HandyJSON实现方案浅析/" >HandyJSON实现方案浅析</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/22</span><a class="archive-post-title" href= "/2018/02/22/兼容iOS与OSX的轻量级富文本处理Label (自己造的小轮子)/" >MK_Text富文本处理Lable 兼容iOS和OSX</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
     <div class="archive-year"> 2017 </div>
     <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/29</span><a class="archive-post-title" href= "/2017/12/29/Mac开发---NSDocument/" >Mac开发---NSDocument</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/25</span><a class="archive-post-title" href= "/2017/12/25/OpenGL ES on iOS --- Assimp/" >OpenGL ES on iOS --- Assimp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/19</span><a class="archive-post-title" href= "/2017/12/19/RXSwift 源码浅析(二)/" >RXSwift源码浅析(二)</a>
+        </li>
     
     
         <li class="archive-post-item">
@@ -808,12 +1219,12 @@ API初始化12- (nullable instancetyp...
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
         </li>
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
         </li>
     
     
@@ -868,33 +1279,40 @@ API初始化12- (nullable instancetyp...
     
     </div>
   </div>
-        <div class="sidebar-tags">
+        <div class="sidebar-panel-tags">
     <div class="sidebar-tags-name">
     
-        <span class="sidebar-tag-name"><a href= "#">iOS网络</a></span>
+        <span class="sidebar-tag-name" data-tags="iOS网络"><span class="iconfont-archer">&#xe606;</span>iOS网络</span>
     
-        <span class="sidebar-tag-name"><a href= "#">P2P</a></span>
+        <span class="sidebar-tag-name" data-tags="Python"><span class="iconfont-archer">&#xe606;</span>Python</span>
     
-        <span class="sidebar-tag-name"><a href= "#">Opengl ES</a></span>
+        <span class="sidebar-tag-name" data-tags="第三方框架学习"><span class="iconfont-archer">&#xe606;</span>第三方框架学习</span>
     
-        <span class="sidebar-tag-name"><a href= "#">第三方框架学习</a></span>
+        <span class="sidebar-tag-name" data-tags="Mac开发"><span class="iconfont-archer">&#xe606;</span>Mac开发</span>
     
-        <span class="sidebar-tag-name"><a href= "#">iOS安全</a></span>
+        <span class="sidebar-tag-name" data-tags="P2P"><span class="iconfont-archer">&#xe606;</span>P2P</span>
     
-        <span class="sidebar-tag-name"><a href= "#">iOS基础</a></span>
+        <span class="sidebar-tag-name" data-tags="Opengl ES"><span class="iconfont-archer">&#xe606;</span>Opengl ES</span>
     
-        <span class="sidebar-tag-name"><a href= "#">iOS效率</a></span>
+        <span class="sidebar-tag-name" data-tags="iOS安全"><span class="iconfont-archer">&#xe606;</span>iOS安全</span>
     
-        <span class="sidebar-tag-name"><a href= "#">计算机基础</a></span>
+        <span class="sidebar-tag-name" data-tags="iOS基础"><span class="iconfont-archer">&#xe606;</span>iOS基础</span>
+    
+        <span class="sidebar-tag-name" data-tags="iOS效率"><span class="iconfont-archer">&#xe606;</span>iOS效率</span>
+    
+        <span class="sidebar-tag-name" data-tags="开源"><span class="iconfont-archer">&#xe606;</span>开源</span>
+    
+        <span class="sidebar-tag-name" data-tags="计算机基础"><span class="iconfont-archer">&#xe606;</span>计算机基础</span>
     
     </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
     <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
     缺失模块。<br/>
     1、请确保node版本大于6.2<br/>
     2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
     <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
     3、在根目录_config.yml里添加配置：
-    <pre style="color: #888; font-size: 0.6rem;">
+    <pre style="color: #787878; font-size: 0.6rem;">
 jsonContent:
   meta: false
   pages: false
@@ -911,23 +1329,47 @@ jsonContent:
     link: false
     permalink: false
     excerpt: false
-    categories: false
+    categories: true
     tags: true</pre>
     </div> 
-    <div class="sidebar-tag-list"></div>
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
 </div>
     </div>
 </div> 
     <script>
-    var jsInfo = {
-        root: '/'
+    var siteMeta = {
+        root: "/",
+        author: "杨尚达"
     }
 </script>
-    <!-- 不蒜子  -->
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
     
-    <!-- CNZZ统计  -->
+    <!-- busuanzi  -->
+    
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
     
     </div>
+    <!-- async load share.js -->
+     
     </body>
 </html>
 

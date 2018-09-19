@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+    <!-- title -->
+
+
+
+
+<!-- keywords -->
+
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" >
+    <meta name="author" content="杨尚达">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="杨尚达">
+    
+    <meta name="keywords" content="DearMiku,杨尚达">
+    
+    <meta name="description" content="技术分享与生活日常">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>OpenGL ES on iOS --- Assimp · DearMiku</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href= "/css/style.css?v=20180824" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <link rel="stylesheet" href= "/css/mobile.css?v=20180824" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href= "/avatar/sob.jpg" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script" />
+    <link rel="preload" href="/scripts/main.js" as="script" />
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >DearMiku</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">OpenGL ES on iOS --- Assimp</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>DearMiku</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="
+
+
+
+
+
+
+
+height:50vh;
+">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            OpenGL ES on iOS --- Assimp
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Opengl ES">Opengl ES</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">2.1k</span>阅读时长: <span class="post-count reading-time">9 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2017/12/25</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="OpenGL-ES-on-iOS-—-Assimp"><a href="#OpenGL-ES-on-iOS-—-Assimp" class="headerlink" title="OpenGL ES on iOS — Assimp"></a>OpenGL ES on iOS — Assimp</h1><h1 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h1><p>本文主要记录 Assimp库的编译和使用,可能会有不准确的地方,还望多多指正共同学习~</p>
+<p>Assimp是Open Asset Import Library（开放的资产导入库）的缩写。Assimp能够导入很多种不同的模型文件格式（并也能够导出部分的格式），它会将所有的模型数据加载至Assimp的通用数据结构中</p>
+<h1 id="Assimp编译"><a href="#Assimp编译" class="headerlink" title="Assimp编译"></a>Assimp编译</h1><p>这里是库的github地址<a href="https://github.com/assimp/assimp" target="_blank" rel="external">Assimp</a>,下载下来 我们还要编译成iOS可用的库(这里踩坑不少/(ㄒoㄒ)/~~)</p>
+<h2 id="配置CMAKE环境"><a href="#配置CMAKE环境" class="headerlink" title="配置CMAKE环境"></a>配置CMAKE环境</h2><p>CMake是个开源的跨平台自动化建构系统,想要编译Assimp 先要配置好它~ <a href="https://cmake.org/" target="_blank" rel="external">CMake官网</a></p>
+<p>然后将Cmake链接至终端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo &quot;/Applications/CMake.app/Contents/bin/cmake-gui&quot; --install</span><br></pre></td></tr></table></figure>
+<h2 id="编译-Assimp-a"><a href="#编译-Assimp-a" class="headerlink" title="编译 Assimp.a"></a>编译 Assimp.a</h2><p>切换至目标路径<br><img src="/images/OpenGL ES on iOS --- Assimp/screenshot1.png" alt="screenshot"></p>
+<p>执行下面命令~</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//将你需要支持的架构输入 一般就是X86 和 arm64 </span><br><span class="line">./build.sh --stdlib=libc++ --archs=&quot;arm64 x86_64&quot;</span><br></pre></td></tr></table></figure>
+<p>这是你的 lib文件夹下就是这个样子的~<br><img src="/images/OpenGL ES on iOS --- Assimp/screenshot2.png" alt="screenshot"><br>但是这样子 还是不能在iOS上用的哦~ 因为 <code>XML.a</code>只支持 X86架构~ 我们还需要额外编译它</p>
+<h2 id="XML-a"><a href="#XML-a" class="headerlink" title="XML.a"></a>XML.a</h2><p>这时就要使用CMake客户端了~ 创建一个空的build文件夹~,使用Xcode 默认配置生成~<br><img src="/images/OpenGL ES on iOS --- Assimp/screenshot3.png" alt="screenshot"><br><img src="/images/OpenGL ES on iOS --- Assimp/screenshot4.png" alt="screenshot"><br>这时就根据需要编译出自己需要的静态库即可了~~</p>
+<p><img src="/images/OpenGL ES on iOS --- Assimp/screenshot5.png" alt="screenshot"></p>
+<h1 id="Assimp使用"><a href="#Assimp使用" class="headerlink" title="Assimp使用"></a>Assimp使用</h1><h2 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h2><p><img src="/images/OpenGL ES on iOS --- Assimp/15141653578382.jpg" alt=""></p>
+<p>当Assimp加载模型时,会将模型数据加载到Scene(场景)对象中. </p>
+<p>Scene中会有一个Mesh(网格)对象,在Mesh中包含着渲染所需的所有数据,如顶点,法向量,纹理坐标…<br>在Mesh中包含一个Material对象,其中是关于材质的数据(镜面贴图,漫反射贴图,法向量贴图….)<br>在Mesh中还包含了许多Face,Face其实是指物体的渲染图元,一个面包含了组成图元的顶点索引(这里其实就相当于之前讲到的EBO)</p>
+<p>Scene中会包含一个根节点,在根节点之下会有很多子节点~节点中有指向Mesh中数据的索引</p>
+<p>所以我们需要做的就是将Scene中的节点遍历,然后将节点中的数据提取出来,以适合的格式输入到着色器中~~(๑•ᴗ•๑)</p>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><p>定义 Mesh类 和 Model类<br>Mesh类对应每个节点的网格数据,Model则对应Scene对象~</p>
+<p>我展示的代码主要是和Assimp相关的内容~</p>
+<h3 id="头文件"><a href="#头文件" class="headerlink" title="头文件"></a>头文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;assimp/Importer.hpp&quot;</span><br><span class="line">#include &quot;assimp/scene.h&quot;</span><br><span class="line">#include &quot;assimp/postprocess.h&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">//顶点</span><br><span class="line">struct Vertex &#123;</span><br><span class="line">    glm::vec3 Position;</span><br><span class="line">    glm::vec3 Normal;</span><br><span class="line">    glm::vec2 TexCoords;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">struct Vertex &#123;</span><br><span class="line">    glm::vec3 Position;</span><br><span class="line">    glm::vec3 Normal;</span><br><span class="line">    glm::vec2 TexCoords;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">class Mesh &#123;</span><br><span class="line">    std::vector&lt;Vertex&gt; vertices;       //顶点</span><br><span class="line">    std::vector&lt;unsigned int&gt; indices;  //索引</span><br><span class="line">    std::vector&lt;Texture&gt; textures;      //纹理</span><br><span class="line">    </span><br><span class="line">    unsigned int VAO, VBO, EBO;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">class Model&#123;</span><br><span class="line">    std::vector&lt;Texture&gt; textures_loaded;   //缓冲纹理,避免多次加载</span><br><span class="line">    std::vector&lt;Mesh&gt; meshes;               //节点数据数组</span><br><span class="line">    std::string directory;                  //加载路径</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="加载Scene"><a href="#加载Scene" class="headerlink" title="加载Scene"></a>加载Scene</h3><h4 id="遍历根节点及其下属所有子节点"><a href="#遍历根节点及其下属所有子节点" class="headerlink" title="遍历根节点及其下属所有子节点"></a>遍历根节点及其下属所有子节点</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Assimp::Importer import;</span><br><span class="line"></span><br><span class="line">//获取Scene</span><br><span class="line">const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);</span><br><span class="line"></span><br><span class="line">if(!scene || scene-&gt;mFlags &amp; AI_SCENE_FLAGS_INCOMPLETE || !scene-&gt;mRootNode)</span><br><span class="line">&#123;</span><br><span class="line">    printf(&quot;ERROR::ASSIMP:: %s&quot;,import.GetErrorString());</span><br><span class="line">    return;</span><br><span class="line">&#125;</span><br><span class="line">directory = path.substr(0, path.find_last_of(&apos;/&apos;));</span><br><span class="line"></span><br><span class="line">processNode(scene-&gt;mRootNode, scene);</span><br></pre></td></tr></table></figure>
+<p><code>ReadFile</code>将指定路径的模型加载,Path为路径,后面的是加载时的额外处理 </p>
+<blockquote>
+<p><code>aiProcess_Triangulate</code>将加载的图元变换为三角形<br><code>aiProcess_FlipUVs</code>翻转纹理坐标Y轴(OpenGL的纹理Y轴是翻的~)<br><code>aiProcess_GenNormals</code> 若模型不包含法向量的话，就为每个顶点创建法线<br><code>aiProcess_SplitLargeMeshes</code>将较大的网格分割为较小的网格(当渲染有最大顶点数量要求时)<br><code>aiProcess_OptimizeMeshes</code>将较小的网格们拼接为较大的一个网格(减少绘制调用)<br><a href="http://assimp.sourceforge.net/lib_html/postprocess_8h.html" target="_blank" rel="external">指令大全~~</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">void processNode(aiNode *node, const aiScene *scene)&#123;</span><br><span class="line">    //提取节点数据~</span><br><span class="line">    for(unsigned int i = 0; i &lt; node-&gt;mNumMeshes; i++)</span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">        aiMesh *mesh = scene-&gt;mMeshes[node-&gt;mMeshes[i]];</span><br><span class="line">        meshes.push_back(processMesh(mesh, scene));</span><br><span class="line">    &#125;</span><br><span class="line">    //递归遍历</span><br><span class="line">    for(unsigned int i = 0; i &lt; node-&gt;mNumChildren; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        processNode(node-&gt;mChildren[i], scene);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="提取节点网格数据"><a href="#提取节点网格数据" class="headerlink" title="提取节点网格数据"></a>提取节点网格数据</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">Mesh processMesh(aiMesh *mesh, const aiScene *scene) &#123;</span><br><span class="line">    </span><br><span class="line">    //需要提取的数据~</span><br><span class="line">    std::vector&lt;Vertex&gt; vertices;</span><br><span class="line">    std::vector&lt;unsigned int&gt; indices;</span><br><span class="line">    std::vector&lt;Texture&gt; textures;</span><br><span class="line"></span><br><span class="line">    //将顶点数据提取</span><br><span class="line">    for(unsigned int i = 0; i &lt; mesh-&gt;mNumVertices; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        Vertex vertex;</span><br><span class="line">        glm::vec3 vector; </span><br><span class="line">        // positions</span><br><span class="line">        vector.x = mesh-&gt;mVertices[i].x;</span><br><span class="line">        vector.y = mesh-&gt;mVertices[i].y;</span><br><span class="line">        vector.z = mesh-&gt;mVertices[i].z;</span><br><span class="line">        vertex.Position = vector;       </span><br><span class="line">        // normals</span><br><span class="line">        vector.x = mesh-&gt;mNormals[i].x;</span><br><span class="line">        vector.y = mesh-&gt;mNormals[i].y;</span><br><span class="line">        vector.z = mesh-&gt;mNormals[i].z;</span><br><span class="line">        vertex.Normal = vector;         </span><br><span class="line">   </span><br><span class="line">        if(mesh-&gt;mTextureCoords[0])             &#123;</span><br><span class="line">            glm::vec2 vec;</span><br><span class="line">   </span><br><span class="line">            vec.x = mesh-&gt;mTextureCoords[0][i].x;</span><br><span class="line">            vec.y = mesh-&gt;mTextureCoords[0][i].y;</span><br><span class="line">            vertex.TexCoords = vec;</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">            vertex.TexCoords = glm::vec2(0.0f, 0.0f);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        vertices.push_back(vertex);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    //将索引数据提取</span><br><span class="line">    for(unsigned int i = 0; i &lt; mesh-&gt;mNumFaces; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        aiFace face = mesh-&gt;mFaces[i];</span><br><span class="line">       </span><br><span class="line">        for(unsigned int j = 0; j &lt; face.mNumIndices; j++)</span><br><span class="line">            indices.push_back(face.mIndices[j]);</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    //将纹理数据提取(漫反射纹理,镜面纹理...)</span><br><span class="line">    aiMaterial* material = scene-&gt;mMaterials[mesh-&gt;mMaterialIndex];</span><br><span class="line"></span><br><span class="line">    std::vector&lt;Texture&gt; diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, &quot;texture_diffuse&quot;);</span><br><span class="line">    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());</span><br><span class="line">  </span><br><span class="line">    std::vector&lt;Texture&gt; specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, &quot;texture_specular&quot;);</span><br><span class="line">    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());</span><br><span class="line">   </span><br><span class="line">    std::vector&lt;Texture&gt; normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, &quot;texture_normal&quot;);</span><br><span class="line">    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());</span><br><span class="line">   </span><br><span class="line">    std::vector&lt;Texture&gt; heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, &quot;texture_height&quot;);</span><br><span class="line">    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());</span><br><span class="line"></span><br><span class="line">    return Mesh(vertices, indices, textures);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">    std::vector&lt;Texture&gt; loadMaterialTextures(aiMaterial *mat, aiTextureType type,std::string typeName)  &#123;</span><br><span class="line">        std::vector&lt;Texture&gt; textures;</span><br><span class="line">        for(unsigned int i = 0; i &lt; mat-&gt;GetTextureCount(type); i++)</span><br><span class="line">        &#123;</span><br><span class="line">            aiString str;</span><br><span class="line">            mat-&gt;GetTexture(type, i, &amp;str);</span><br><span class="line">            //检查纹理是否之前已经加载过,</span><br><span class="line">            bool skip = false;</span><br><span class="line">            for(unsigned int j = 0; j &lt; textures_loaded.size(); j++)</span><br><span class="line">            &#123;</span><br><span class="line">                if(std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)</span><br><span class="line">                &#123;</span><br><span class="line">                    textures.push_back(textures_loaded[j]);</span><br><span class="line">                    skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            if(!skip)</span><br><span class="line">            &#123;   // if texture hasn&apos;t been loaded already, load it</span><br><span class="line">                //若纹理未加载,则加载</span><br><span class="line">                Texture texture;</span><br><span class="line">                texture.id = TextureFromFile(str.C_Str(), this-&gt;directory);</span><br><span class="line">                texture.type = typeName;</span><br><span class="line">                texture.path = str.C_Str();</span><br><span class="line">                textures.push_back(texture);</span><br><span class="line">                textures_loaded.push_back(texture);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return textures;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //将纹理加载,输入到着色器</span><br><span class="line">    unsigned int TextureFromFile(const char *path, const std::string &amp;directory, bool gamma)</span><br><span class="line">&#123;</span><br><span class="line">    std::string filename = std::string(path);</span><br><span class="line">    filename = directory + &apos;/&apos; + filename;</span><br><span class="line"></span><br><span class="line">    unsigned int textureID;</span><br><span class="line">    glGenTextures(1, &amp;textureID);</span><br><span class="line"></span><br><span class="line">    int width, height, nrComponents;</span><br><span class="line">    unsigned char *data = stbi_load(filename.c_str(), &amp;width, &amp;height, &amp;nrComponents, 0);</span><br><span class="line">    if (data)</span><br><span class="line">    &#123;</span><br><span class="line">        GLenum format;</span><br><span class="line">        if (nrComponents == 1)</span><br><span class="line">            format = GL_RED;</span><br><span class="line">        else if (nrComponents == 3)</span><br><span class="line">            format = GL_RGB;</span><br><span class="line">        else if (nrComponents == 4)&#123;</span><br><span class="line"></span><br><span class="line">            for (int i = 0; i&lt;width*height; i++ ) &#123;</span><br><span class="line">                char tR = data[i*4+2];</span><br><span class="line">                data[i*4+2] = data[i*4];</span><br><span class="line">                data[i*4] = tR;</span><br><span class="line">            &#125;</span><br><span class="line">            format = GL_RGBA;</span><br><span class="line">        &#125;</span><br><span class="line">        glBindTexture(GL_TEXTURE_2D, textureID);</span><br><span class="line">        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);</span><br><span class="line">        glGenerateMipmap(GL_TEXTURE_2D);</span><br><span class="line"></span><br><span class="line">        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);</span><br><span class="line">        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);</span><br><span class="line">        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);</span><br><span class="line">        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);</span><br><span class="line"></span><br><span class="line">        stbi_image_free(data);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        //std::cout &lt;&lt; &quot;Texture failed to load at path: &quot; &lt;&lt; path &lt;&lt; std::endl;</span><br><span class="line">        printf(&quot;Texture failed to load at path: %s&quot;,path);</span><br><span class="line">        stbi_image_free(data);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return textureID;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>在加载模型数据时,需要注意的是 模型并不一定会提供完整的贴图,例如 有的简单模型,建模师有可能不会为其添加贴图,而是给模型设置一种高光材质,以节约资源.这时 材质信息存储在mtl文件中,而且还有可能连mtl文件也没有, 这时 则需要我们添加默认材质~</p>
+<blockquote>
+<p>.mtl文件（Material Library File）是材质库文件，描述的是物体的材质信息，ASCII存储，任何文本编辑器可以将其打开和编辑。一个.mtl文件可以包含一个或多个材质定义，对于每个材质都有其颜色，纹理和反射贴图的描述，应用于物体的表面和顶点。想详细了解的朋友们可以看这里<a href="http://blog.csdn.net/u013467442/article/details/46792495" target="_blank" rel="external">.obj文件格式与.mtl文件格式</a></p>
+</blockquote>
+<h3 id="绘制"><a href="#绘制" class="headerlink" title="绘制"></a>绘制</h3><p>绘制就很简单了,将提取出来的每个网格的数据 传入着色器就好~</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">void Draw(GLuint program)&#123;</span><br><span class="line"></span><br><span class="line">    glBindVertexArray(VAO);</span><br><span class="line">    unsigned int diffuseNr = 1;</span><br><span class="line">    unsigned int specularNr = 1;</span><br><span class="line">    for(unsigned int i = 0; i &lt; textures.size(); i++)</span><br><span class="line">    &#123;</span><br><span class="line">        glActiveTexture(GL_TEXTURE0 + i); </span><br><span class="line">        std::stringstream ss;</span><br><span class="line">        std::string number;</span><br><span class="line">        std::string name = textures[i].type;</span><br><span class="line">        if(name == &quot;texture_diffuse&quot;)</span><br><span class="line">            ss &lt;&lt; diffuseNr++; </span><br><span class="line">        else if(name == &quot;texture_specular&quot;)</span><br><span class="line">            ss &lt;&lt; specularNr++;</span><br><span class="line">        number = ss.str();</span><br><span class="line"></span><br><span class="line">        glUniform1i(glGetUniformLocation(program, (&quot;material.&quot; + name + number).c_str()), i);</span><br><span class="line"></span><br><span class="line">        glBindTexture(GL_TEXTURE_2D, textures[i].id);</span><br><span class="line">    &#125;</span><br><span class="line">    glActiveTexture(GL_TEXTURE0);</span><br><span class="line">    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在着色器中,也就是将获取的顶点数据 和 纹理 按照需要进行输出就好了~ 和 绘制木箱子无异~</p>
+<p><img src="/images/OpenGL ES on iOS --- Assimp/Simulator%20Screen%20Shot%20-%20iPhone%20X%20-%202017-12-25%20at%2013.20.14.png" alt="结果-w300"></p>
+<h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>我对这一块的内容也并不是十分熟练,所以Assimp使用这里有些粗略,以后有啥新的收获也会补上~ 倒是Assimp库编译那里 我是踩了好多坑~ </p>
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="http://yoursite.com">杨尚达</a>
+            <p>原文链接：<a href="http://yoursite.com/2017/12/25/OpenGL ES on iOS --- Assimp/">http://yoursite.com/2017/12/25/OpenGL ES on iOS --- Assimp/</a>
+            <p>发表日期：<a href="http://yoursite.com/2017/12/25/OpenGL ES on iOS --- Assimp/">December 25th 2017, 1:27:28 pm</a>
+            <p>更新日期：<a href="http://yoursite.com/2017/12/25/OpenGL ES on iOS --- Assimp/">September 12th 2018, 3:23:15 pm</a>
+            <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href= "/2017/12/29/Mac开发---NSDocument/" title= "Mac开发---NSDocument">
+                    <div class="nextTitle">Mac开发---NSDocument</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href= "/2017/12/19/RXSwift 源码浅析(二)/" title= "RXSwift源码浅析(二)">
+                    <div class="prevTitle">RXSwift源码浅析(二)</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!-- partial('_partial/comment/changyan') -->
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:372154465@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://github.com/dearmiku" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+            
+                <a href="//weibo.com/5232876666/profile?rightmod=1&wvr=6&mod=personinfo" class="iconfont-archer weibo" target="_blank" title=weibo></a>
+            
+        
+    
+        
+            
+                <a href="//juejin.im/user/5a040a8751882529d7760823" class="iconfont-archer juejin" target="_blank" title=juejin></a>
+            
+        
+    
+        
+            
+                <a href="//space.bilibili.com/2035239/#/" class="iconfont-archer bilibili" target="_blank" title=bilibili></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#OpenGL-ES-on-iOS-—-Assimp"><span class="toc-number">1.</span> <span class="toc-text">OpenGL ES on iOS — Assimp</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#简述"><span class="toc-number">2.</span> <span class="toc-text">简述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Assimp编译"><span class="toc-number">3.</span> <span class="toc-text">Assimp编译</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#配置CMAKE环境"><span class="toc-number">3.1.</span> <span class="toc-text">配置CMAKE环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译-Assimp-a"><span class="toc-number">3.2.</span> <span class="toc-text">编译 Assimp.a</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XML-a"><span class="toc-number">3.3.</span> <span class="toc-text">XML.a</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Assimp使用"><span class="toc-number">4.</span> <span class="toc-text">Assimp使用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#模型结构"><span class="toc-number">4.1.</span> <span class="toc-text">模型结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码"><span class="toc-number">4.2.</span> <span class="toc-text">代码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#头文件"><span class="toc-number">4.2.1.</span> <span class="toc-text">头文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#属性"><span class="toc-number">4.2.2.</span> <span class="toc-text">属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#加载Scene"><span class="toc-number">4.2.3.</span> <span class="toc-text">加载Scene</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#遍历根节点及其下属所有子节点"><span class="toc-number">4.2.3.1.</span> <span class="toc-text">遍历根节点及其下属所有子节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#提取节点网格数据"><span class="toc-number">4.2.3.2.</span> <span class="toc-text">提取节点网格数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#注意"><span class="toc-number">4.2.3.3.</span> <span class="toc-text">注意</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#绘制"><span class="toc-number">4.2.4.</span> <span class="toc-text">绘制</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#结尾"><span class="toc-number">5.</span> <span class="toc-text">结尾</span></a></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 28
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span><a class="archive-post-title" href= "/2018/09/19/Flask + Gunicorn + Nginx 部署/" >Flask + Gunicorn + Nginx 部署</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/07</span><a class="archive-post-title" href= "/2018/09/07/Python学习协程asyncio/" >Python学习--协程--asyncio</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/10</span><a class="archive-post-title" href= "/2018/04/10/HandyJSON实现方案浅析/" >HandyJSON实现方案浅析</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/22</span><a class="archive-post-title" href= "/2018/02/22/兼容iOS与OSX的轻量级富文本处理Label (自己造的小轮子)/" >MK_Text富文本处理Lable 兼容iOS和OSX</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/29</span><a class="archive-post-title" href= "/2017/12/29/Mac开发---NSDocument/" >Mac开发---NSDocument</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/25</span><a class="archive-post-title" href= "/2017/12/25/OpenGL ES on iOS --- Assimp/" >OpenGL ES on iOS --- Assimp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/19</span><a class="archive-post-title" href= "/2017/12/19/RXSwift 源码浅析(二)/" >RXSwift源码浅析(二)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/17</span><a class="archive-post-title" href= "/2017/12/17/RXSwift源码浅析(一)/" >RXSwift源码浅析(一)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/06</span><a class="archive-post-title" href= "/2017/12/06/OpenGL ES on iOS --- 光照进阶/" >OpenGL ES on iOS --- 光照进阶</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/05</span><a class="archive-post-title" href= "/2017/12/05/OpenGL ES on iOS --- 基础光照/" >OpenGL ES on iOS --- 基础光照</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/01</span><a class="archive-post-title" href= "/2017/12/01/OpenGL ES on iOS --- 坐标系统与矩阵转换/" >OpenGL ES on iOS --- 坐标系统与矩阵转换</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/29</span><a class="archive-post-title" href= "/2017/11/29/OpenGL ES on iOS --- 2D纹理/" >OpenGL ES on iOS --- 2D纹理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/28</span><a class="archive-post-title" href= "/2017/11/28/OpenGL ES on iOS --- 统一变量(Uniform)和统一变量块(UBO)/" >Opengl ES 3.0 on iOS--- 统一变量(Uniform)和统一变量块(UBO)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href= "/2017/11/23/YYAsyncLayer 学习/" >YYAsyncLayer 学习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/HTTP 2.0/" >HTTP 2.0</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/19</span><a class="archive-post-title" href= "/2017/11/19/iOS安全 -- 数据加密/" >iOS安全 -- 数据加密</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 数据安全/" >iOS安全 -- 数据安全</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/18</span><a class="archive-post-title" href= "/2017/11/18/iOS安全 -- 越狱检测/" >iOS安全 -- 越狱检测</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/NTA打洞/" >NTA打洞</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/17</span><a class="archive-post-title" href= "/2017/11/17/编译,汇编,反编译,反汇编/" >编译,汇编,反编译,反汇编</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href= "/2017/11/16/NAT与内网穿透/" >NAT与内网穿透</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/15</span><a class="archive-post-title" href= "/2017/11/15/CocoaAsyncSocket实现局域网内通信/" >CocoaAsyncSocket实现局域网内通信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/03</span><a class="archive-post-title" href= "/2017/11/03/iOS中使用Protocol Buffer/" >iOS中使用Protocol Buffer</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/26</span><a class="archive-post-title" href= "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >iOS自动打包脚本上传至蒲公英</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="iOS网络"><span class="iconfont-archer">&#xe606;</span>iOS网络</span>
+    
+        <span class="sidebar-tag-name" data-tags="Python"><span class="iconfont-archer">&#xe606;</span>Python</span>
+    
+        <span class="sidebar-tag-name" data-tags="第三方框架学习"><span class="iconfont-archer">&#xe606;</span>第三方框架学习</span>
+    
+        <span class="sidebar-tag-name" data-tags="Mac开发"><span class="iconfont-archer">&#xe606;</span>Mac开发</span>
+    
+        <span class="sidebar-tag-name" data-tags="P2P"><span class="iconfont-archer">&#xe606;</span>P2P</span>
+    
+        <span class="sidebar-tag-name" data-tags="Opengl ES"><span class="iconfont-archer">&#xe606;</span>Opengl ES</span>
+    
+        <span class="sidebar-tag-name" data-tags="iOS安全"><span class="iconfont-archer">&#xe606;</span>iOS安全</span>
+    
+        <span class="sidebar-tag-name" data-tags="iOS基础"><span class="iconfont-archer">&#xe606;</span>iOS基础</span>
+    
+        <span class="sidebar-tag-name" data-tags="iOS效率"><span class="iconfont-archer">&#xe606;</span>iOS效率</span>
+    
+        <span class="sidebar-tag-name" data-tags="开源"><span class="iconfont-archer">&#xe606;</span>开源</span>
+    
+        <span class="sidebar-tag-name" data-tags="计算机基础"><span class="iconfont-archer">&#xe606;</span>计算机基础</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "杨尚达"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
