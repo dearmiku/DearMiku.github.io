@@ -22,7 +22,7 @@
     <meta name="description" content="技术分享与生活日常">
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>Mac开发---NSDocument · DearMiku</title>
+    <title>DearMiku</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -203,23 +203,12 @@
 </head>
 
     
-        <body class="post-body">
-    
     
 <header class="header">
 
     <div class="read-progress"></div>
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
-    
-    <div class="banner">
-            <div class="blog-title">
-                <a href="/" >DearMiku</a>
-            </div>
-            <div class="post-title">
-                <a href="#" class="post-name">Mac开发---NSDocument</a>
-            </div>
-    </div>
     
     <a class="home-link" href=/>DearMiku</a>
 </header>
@@ -231,74 +220,24 @@
 
 
 
-
-height:50vh;
 ">
     
     <!-- 主页  -->
-    
-    
-    <!-- 404页  -->
             
     <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/intro/2bWomen.jpg)"></div>
+    <div class="site-intro-img" style="background-image: url(/)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
-            
-            Mac开发---NSDocument
-            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
-            
-            <!-- 404 -->
-            
         </p>
         <!-- 文章页meta -->
-        
-            <div class="post-intros">
-                <!-- 文章页标签  -->
-                
-                    <div class= post-intro-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "Mac开发">Mac开发</a>
-    
-</div>
-                
-                
-                    <div class="post-intro-read">
-                        <span>字数统计: <span class="post-count word-count">1.5k</span>阅读时长: <span class="post-count reading-time">5 min</span></span>
-                    </div>
-                
-                <div class="post-intro-meta">
-                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
-                    <span class="post-intro-time">2017/12/29</span>
-                    
-                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
-                        <span class="iconfont-archer">&#xe602;</span>
-                        <span id="busuanzi_value_page_pv"></span>
-                    </span>
-                    
-                    <span class="shareWrapper">
-                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
-                        <span class="shareText">Share</span>
-                        <ul class="shareList">
-                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
-                                <div class="share-qrcode"></div>
-                            </li>
-                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
-                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
-                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
-                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
-                        </ul>
-                    </span>
-                </div>
-            </div>
         
     </div>
 </div>
@@ -399,88 +338,41 @@ height:50vh;
 </script>        
         <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
-            <main class="main post-page">
-    <article class="article-entry">
-        <h1 id="Mac开发—NSDocument"><a href="#Mac开发—NSDocument" class="headerlink" title="Mac开发—NSDocument"></a>Mac开发—NSDocument</h1><h1 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h1><p>最近在写的App是这种这种类型的,总结了总结,写了这篇博文,本文旨在介绍如何实现 基于文档的Mac App 若有描述不准确或错误的地方 还望多多指正,共同学习(๑•ᴗ•๑)</p>
-<p>实现的效果也就是 在文档的打开方式中有自己的App可选,将文件拖拽至Dock栏中可以打开~</p>
-<h1 id="NSDocument"><a href="#NSDocument" class="headerlink" title="NSDocument"></a>NSDocument</h1><p><code>NSDocument</code>类相当于一层封装~ ,类似于<code>UIImage</code>,无论是jpg格式还是png格式都以<code>UIImage</code>对象进行调用~</p>
-<p><code>NSDocument</code>则不仅可以对外持有 文档数据, 对内可以绑定 窗口控制器~.当打开文档时自动创建并展示与其绑定的窗口控制器~</p>
-<p>Xcode提供的Document模板大概就是下面这个样子~<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">import Cocoa</span><br><span class="line"></span><br><span class="line">class Document: NSDocument &#123;</span><br><span class="line">    var saveData:Data!</span><br><span class="line"></span><br><span class="line">    //是否自动保存(出用户选择外的所有保存方式 都是非自动保存,像按钮..点击的方法中可以保存,其他的不能)</span><br><span class="line">    override class var autosavesInPlace: Bool &#123;</span><br><span class="line">        return true</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //用于为Document绑定WindowController,当打开新的Document时,对应的WindowController就会被打开~(不绑定也是可以的)</span><br><span class="line">    override func makeWindowControllers() &#123;</span><br><span class="line">        let storyboard = NSStoryboard(name: NSStoryboard.Name(&quot;Main&quot;), bundle: nil)</span><br><span class="line">        let windowController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(&quot;Document Window Controller&quot;)) as! NSWindowController</span><br><span class="line">        self.addWindowController(windowController)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //将当前文档保存时调用</span><br><span class="line">    override func data(ofType typeName: String) throws -&gt; Data &#123;</span><br><span class="line">        Swift.print(&quot;保存文件&quot;)</span><br><span class="line">        return saveData</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //当读取新的数据时调用</span><br><span class="line">    override func read(from data: Data, ofType typeName: String) throws &#123;</span><br><span class="line">        saveData = data</span><br><span class="line">        Swift.print(&quot;读取内容 来自\(self.fileURL)&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //自动保存时调用的方法~ 当前是否能判断是否</span><br><span class="line">    override func autosave(withImplicitCancellability autosavingIsImplicitlyCancellable: Bool, completionHandler: @escaping (Error?) -&gt; Void) &#123;</span><br><span class="line">        Swift.print(&quot;调用自动保存&quot;)</span><br><span class="line"></span><br><span class="line">        //completionHandler(nil)</span><br><span class="line">        completionHandler(NSError.init(domain: &quot;错误提示&quot;, code: 0, userInfo: nil))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="NSDocumentController"><a href="#NSDocumentController" class="headerlink" title="NSDocumentController"></a>NSDocumentController</h1><p>顾名思义是负责对<code>Document</code>进行管理,是一个单例~ 方法也就主要是下面这些~</p>
-<h2 id="新建"><a href="#新建" class="headerlink" title="新建"></a>新建</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">NSDocumentController.shared.newDocument(nil)</span><br><span class="line">//也可以直接init一个Document,然后加进去</span><br></pre></td></tr></table></figure>
-<h2 id="打开"><a href="#打开" class="headerlink" title="打开"></a>打开</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//用户通过面板打开一个新的Document </span><br><span class="line">NSDocumentController.shared.openDocument(nil)</span><br><span class="line"></span><br><span class="line">//这里也可以使用NSDocument的init方法创建(使用的重载方法不同),但是这样创建的对象不再NSDocumentController的管理内~ 可以手动加入其中</span><br></pre></td></tr></table></figure>
-<h2 id="保存"><a href="#保存" class="headerlink" title="保存"></a>保存</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//保存所有文档</span><br><span class="line">NSDocumentController.shared.saveAllDocuments(nil)</span><br><span class="line"></span><br><span class="line">//也可以调用NSDocument的save方法</span><br></pre></td></tr></table></figure>
-<h2 id="导出"><a href="#导出" class="headerlink" title="导出"></a>导出</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这里应该调用的是 Document的 saveAs()/saveTo() 方法, 为了工整一些 我就放在这里了~</span><br></pre></td></tr></table></figure>
-<h1 id="info-plist配置"><a href="#info-plist配置" class="headerlink" title="info.plist配置"></a>info.plist配置</h1><p>对<code>NSDocument</code>类支持的文档类型和导出的文档类型是在 <code>info.plist</code>中存储的~ 我们可以在Targets-&gt;info中进行设置~ 需要对<strong>Document Type</strong>和<strong>Export UTIs</strong>进行设置~~</p>
-<p><img src="/images/Mac开发---NSDocument/screenshot1.png" alt="screenshot"></p>
-<p>这里就引入了一个概念<strong>UTI</strong>,它是Apple系统处理文档文件等数据的统一类型标识符,也可以把它理解为苹果爸爸对其他各类文档数据的别名,大家叫<code>jpg</code>,苹果爸爸叫它<code>public.jpeg</code>.除去UTI中约定好的部分,对于 我们自创的类型,则可以设置自创的别名~ 在这里我就使用已有类型了<code>jpg</code> 其他的<strong>UTI</strong>看这里<a href="https://developer.apple.com/library/content/documentation/Miscellaneous/Reference/UTIRef/Articles/System-DeclaredUniformTypeIdentifiers.html#//apple_ref/doc/uid/TP40009259-SW1" target="_blank" rel="external">Uniform Type Identifies</a></p>
-<h2 id="Document-Types"><a href="#Document-Types" class="headerlink" title="Document Types"></a>Document Types</h2><p><strong>Name</strong>: 文档的类型名称,可为空~</p>
-<p><strong>identifer</strong>: 文档标识,若是用自定义的类型,这里可以写自定义的类型.若是针对已有类型可以在UTI中找~</p>
-<p><strong>Class</strong>: 标识该类型对应在项目中的Document类,我使用的继承<code>NSDocument</code>的子类 MK_Document,所以这里填 <code>$(PRODUCT_MODULE_NAME).MK_Document</code></p>
-<p><strong>Roler</strong>: 这里表示应用对文档的处理权限, Editor(读写),Viewer(只读). </p>
-<p><strong>Extensions</strong>: 文档后缀,不区别大小写~</p>
-<p><strong>Icon</strong>: 自定义类型在Finder中显示的样子(有时候可以,有时候不行,就和我用Movist看<code>mkv</code>视频,有时候可以带上Movist图标,有时候不行~ 要有懂这个图片设置的老铁 分享一蛤~)</p>
-<p>至于其他的一些选项,我没用到</p>
-<p>至于下面那个<code>additional document type properties</code>是设置额外的文档属性,在旧版Xcode中Document Types在这里的选项并没有这么多,那个时候需要用它设置额外的一些属性,我用的Xcode9上面提供的选项已经够用了~~</p>
-<p>当我们设置多个Document Type且绑定至同一个Document上时,在新建的文档保存/导出时,会让我们选择格式~<br><img src="/images/Mac开发---NSDocument/screenshot3.png" alt="screenshot"></p>
-<h2 id="Export-UTLs"><a href="#Export-UTLs" class="headerlink" title="Export UTLs"></a>Export UTLs</h2><p>若是App只是使用已有的文档类型如<code>jpg</code>,则是在Document Types中设置就已经足够了,但是若要试用自定义类型的话,则需要用到</p>
-<p><img src="/images/Mac开发---NSDocument/screenshot2.png" alt="screenshot"></p>
-<p>这里就简单展示了一下自定义类型,需要注意的是 上面除了<code>Description</code>外都是必填的~</p>
-<p><strong>identifer</strong>和<strong>Extension</strong>这里是自定以的~怎么写都好~ 但是上下要一致</p>
-<p><strong>Conforms To</strong>这里我填写的是<code>public.data</code>,这里到底写什么,可以在UTIs中按需选择~</p>
-<p>效果如下~~<br><img src="/images/Mac开发---NSDocument/miku.png" alt="miku"></p>
-<h1 id="FileWrapper"><a href="#FileWrapper" class="headerlink" title="FileWrapper"></a>FileWrapper</h1><p>有些时候,我们的文档并非只是一个文档,还有类似于<code>bundle</code>这种类型的文档包,(在这里吐槽一句,其实MarkDown也应该做成文档包这种样式就好了~) 效果如下<br><img src="/images/Mac开发---NSDocument/wrap.png" alt="wrap"></p>
-<p>配置FileWrapper和上面略有不同~ </p>
-<h2 id="infor配置"><a href="#infor配置" class="headerlink" title="infor配置"></a>infor配置</h2><p><img src="/images/Mac开发---NSDocument/screenshot4.png" alt="screenshot"></p>
-<p>主要就是将<strong>Conforms To</strong>改一下~ 然后在<strong>Document</strong>中实现对应的<code>NSFileWrape</code>方法 其他地方也就是换汤不换药</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">//保存时调用</span><br><span class="line">override func fileWrapper(ofType typeName: String) throws -&gt; FileWrapper &#123;</span><br><span class="line">    let  fileWrappers  = FileWrapper(directoryWithFileWrappers: [:])</span><br><span class="line"></span><br><span class="line">    return fileWrappers</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//读取时调用~ 包中的数据可以通过 filleWraper</span><br><span class="line">override func read(from fileWrapper: FileWrapper, ofType typeName: String) throws &#123;</span><br><span class="line">    for item in fileWrapper.fileWrappers! &#123;</span><br><span class="line">        Swift.print(&quot;获得\(item.key)&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><code>NSDocument</code>是 对文档的封装,无论面对什么样的文档 都是NSDocument对象,和 NSData一样~ 这种设计方案是是值得我们借鉴的 尤其是在写SDK时~ </p>
-<p>若上文有不准确的地方 还望多多指正 共同学习 (๑•ᴗ•๑)</p>
-
-    </article>
-    <!-- license  -->
+            <main class="main index-page">
     
-        <div class="license-wrapper">
-            <p>原文作者：<a href="http://yoursite.com">杨尚达</a>
-            <p>原文链接：<a href="http://yoursite.com/2017/12/29/Mac开发---NSDocument/">http://yoursite.com/2017/12/29/Mac开发---NSDocument/</a>
-            <p>发表日期：<a href="http://yoursite.com/2017/12/29/Mac开发---NSDocument/">December 29th 2017, 11:06:29 am</a>
-            <p>更新日期：<a href="http://yoursite.com/2017/12/29/Mac开发---NSDocument/">September 12th 2018, 3:23:15 pm</a>
-            <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+    
+    
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2018/11/22/搬瓦工SS翻墙配置方案/" >
+            
+                <span>搬瓦工SS翻墙配置方案</span>
+        </a>
+        <div class="abstract-content">
+            搬瓦工SS翻墙配置方案进入KVM ss一键配置界面https://kiwivm.64clouds.com/main-exec.php?mode=extras_shadowsocks
+配置详细流程
+
         </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/11/22</span>
+            </div>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "生产工具">生产工具</a>
+    
+</div>
+            
+        </div>
+    </article>
     
     <!-- paginator  -->
-    <ul class="post-paginator">
-        <li class="next">
-            
-                <div class="nextSlogan">Next Post</div>
-                <a href= "/2018/02/22/兼容iOS与OSX的轻量级富文本处理Label (自己造的小轮子)/" title= "MK_Text富文本处理Lable 兼容iOS和OSX">
-                    <div class="nextTitle">MK_Text富文本处理Lable 兼容iOS和OSX</div>
-                </a>
-            
-        </li>
-        <li class="previous">
-            
-                <div class="prevSlogan">Previous Post</div>
-                <a href= "/2017/12/25/OpenGL ES on iOS --- Assimp/" title= "OpenGL ES on iOS --- Assimp">
-                    <div class="prevTitle">OpenGL ES on iOS --- Assimp</div>
-                </a>
-            
-        </li>
-    </ul>
-    <!-- 评论插件 -->
-    <!-- 来必力City版安装代码 -->
-
-<!-- City版安装代码已完成 -->
     
-    
-    <!-- partial('_partial/comment/changyan') -->
-    <!--PC版-->
-
-
-    
-    
-
-    <!-- 评论 -->
 </main>
             <!-- profile -->
             
@@ -540,24 +432,6 @@ height:50vh;
 </footer>
     </div>
     <!-- toc -->
-    
-    <div class="toc-wrapper" style=
-    
-
-
-
-
-
-
-
-top:50vh;
-
-    >
-        <div class="toc-catalog">
-            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
-        </div>
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Mac开发—NSDocument"><span class="toc-number">1.</span> <span class="toc-text">Mac开发—NSDocument</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#简述"><span class="toc-number">2.</span> <span class="toc-text">简述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#NSDocument"><span class="toc-number">3.</span> <span class="toc-text">NSDocument</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#NSDocumentController"><span class="toc-number">4.</span> <span class="toc-text">NSDocumentController</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#新建"><span class="toc-number">4.1.</span> <span class="toc-text">新建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#打开"><span class="toc-number">4.2.</span> <span class="toc-text">打开</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#保存"><span class="toc-number">4.3.</span> <span class="toc-text">保存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#导出"><span class="toc-number">4.4.</span> <span class="toc-text">导出</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#info-plist配置"><span class="toc-number">5.</span> <span class="toc-text">info.plist配置</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Document-Types"><span class="toc-number">5.1.</span> <span class="toc-text">Document Types</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Export-UTLs"><span class="toc-number">5.2.</span> <span class="toc-text">Export UTLs</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#FileWrapper"><span class="toc-number">6.</span> <span class="toc-text">FileWrapper</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#infor配置"><span class="toc-number">6.1.</span> <span class="toc-text">infor配置</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a></li></ol>
-    </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
     <div class="sidebar sidebar-hide">
@@ -1262,8 +1136,6 @@ jsonContent:
     
     </div>
     <!-- async load share.js -->
-    
-        <script src="/scripts/share.js" async></script>    
      
     </body>
 </html>

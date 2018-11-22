@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-10-19T09:03:26.011Z</updated>
+  <updated>2018-11-22T01:19:05.242Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>搬瓦工SS翻墙配置方案</title>
+    <link href="http://yoursite.com/2018/11/22/%E6%90%AC%E7%93%A6%E5%B7%A5SS%E7%BF%BB%E5%A2%99%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88/"/>
+    <id>http://yoursite.com/2018/11/22/搬瓦工SS翻墙配置方案/</id>
+    <published>2018-11-22T01:18:26.000Z</published>
+    <updated>2018-11-22T01:19:05.242Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="搬瓦工SS翻墙配置方案"><a href="#搬瓦工SS翻墙配置方案" class="headerlink" title="搬瓦工SS翻墙配置方案"></a>搬瓦工SS翻墙配置方案</h1><h1 id="进入KVM-ss一键配置界面"><a href="#进入KVM-ss一键配置界面" class="headerlink" title="进入KVM ss一键配置界面"></a>进入KVM ss一键配置界面</h1><p><a href="https://kiwivm.64clouds.com/main-exec.php?mode=extras_shadowsocks" target="_blank" rel="external">https://kiwivm.64clouds.com/main-exec.php?mode=extras_shadowsocks</a></p><h1 id="配置详细流程"><a href="#配置详细流程" class="headerlink" title="配置详细流程"></a>配置详细流程</h1><p><img src="/images/搬瓦工ss翻墙/火狐截图_2018-11-22T01-11-24.643Z" alt="翻墙教程截图"></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;搬瓦工SS翻墙配置方案&quot;&gt;&lt;a href=&quot;#搬瓦工SS翻墙配置方案&quot; class=&quot;headerlink&quot; title=&quot;搬瓦工SS翻墙配置方案&quot;&gt;&lt;/a&gt;搬瓦工SS翻墙配置方案&lt;/h1&gt;&lt;h1 id=&quot;进入KVM-ss一键配置界面&quot;&gt;&lt;a href=&quot;#进入K
+      
+    
+    </summary>
+    
+    
+      <category term="生产工具" scheme="http://yoursite.com/tags/%E7%94%9F%E4%BA%A7%E5%B7%A5%E5%85%B7/"/>
+    
+  </entry>
   
   <entry>
     <title>隐私协议</title>
@@ -453,29 +476,6 @@
     
     
       <category term="iOS基础" scheme="http://yoursite.com/tags/iOS%E5%9F%BA%E7%A1%80/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HTTP 2.0</title>
-    <link href="http://yoursite.com/2017/11/22/HTTP%202.0/"/>
-    <id>http://yoursite.com/2017/11/22/HTTP 2.0/</id>
-    <published>2017-11-22T01:04:12.000Z</published>
-    <updated>2017-12-13T12:58:37.000Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="HTTP-2-0"><a href="#HTTP-2-0" class="headerlink" title="HTTP 2.0"></a>HTTP 2.0</h1><h2 id="HTTP-1-0-缺点"><a href="#HTTP-1-0-缺点" class="headerlink" title="HTTP 1.0 缺点"></a>HTTP 1.0 缺点</h2><p>在http 1.0 时,每进行一次请求时,都会建立一次TCP连接,开销很大</p><h2 id="HTTP-1-1-缺点"><a href="#HTTP-1-1-缺点" class="headerlink" title="HTTP 1.1 缺点"></a>HTTP 1.1 缺点</h2><h3 id="HTTP-Pipelining-http管线技术"><a href="#HTTP-Pipelining-http管线技术" class="headerlink" title="HTTP Pipelining(http管线技术)"></a>HTTP Pipelining(http管线技术)</h3><p>在http1.1中默认是启用该技术的,即消息头中:Connection:keep-alive.</p><p>HTTP Pipelining其实是把多个HTTP请求放到<strong>一个TCP连接</strong>中一一发送，而在发送过程中不需要等待服务器对前一个请求的响应；只不过，客户端还是要<strong>按照发送请求的顺序</strong>来接收响应。这样就像在串行队列中执行任务一样,若前一个任务十分耗时,则会导致后续的响应卡顿.这就是所谓的线头卡顿(Head of line blocking).</p><h3 id="请求数量"><a href="#请求数量" class="headerlink" title="请求数量"></a>请求数量</h3><p>浏览器客户端在同一时间，针对同一域名下的请求有一定数量限制。超过限制数目的请求会被阻塞</p><h3 id="数据大小"><a href="#数据大小" class="headerlink" title="数据大小"></a>数据大小</h3><p>HTTP1.1的格式为文本格式,难以优化. 大量相似http请求时,会发送大量一样的消息头,导致流量浪费.(跟json 与 protocolBuf)</p><h3 id="服务端无法主动推送资源至服务端"><a href="#服务端无法主动推送资源至服务端" class="headerlink" title="服务端无法主动推送资源至服务端"></a>服务端无法主动推送资源至服务端</h3><h2 id="HTTP-2-0-1"><a href="#HTTP-2-0-1" class="headerlink" title="HTTP 2.0"></a>HTTP 2.0</h2><h3 id="数据格式"><a href="#数据格式" class="headerlink" title="数据格式"></a>数据格式</h3><p>HTTP 2.0 使用新的<strong>二进制格式</strong>：基本的协议单位是帧，每个帧都有不同的类型和用途，规范中定义了10种不同的帧。例如，报头(HEADERS)和数据(DATA)帧组成了基本的HTTP 请求和响应；其他帧例如 设置(SETTINGS),窗口更新(WINDOW_UPDATE), 和推送承诺(PUSH_PROMISE)是用来实现HTTP/2的其他功能。那些请求和响应的帧数据通过流来进行数据交换。新的二进制格式是流量控制、优先级、server push等功能的基础.<br><img src="images/HTTP 2.0/15112529987865.jpg" alt=""></p><h3 id="单一连接-多路复用"><a href="#单一连接-多路复用" class="headerlink" title="单一连接,多路复用"></a>单一连接,多路复用</h3><p>http2.0 允许同时通过单一的 HTTP/2 连接发起多重的请求-响应消息。可以理解为在单一的TCP链接中,并发请求响应.<br><img src="images/HTTP 2.0/15112560081647.jpg" alt=""></p><p>在TCP链接时,并不是一开始就到达最大传输速度,因为若带宽不足,一开始高速则会导致阻塞.而是随着时间推移逐渐提速,最后达到适合的速度.这叫做TCP的慢启动. 而这对于HTTP这种突发性,短时性的链接会十分低效.</p><h3 id="首部压缩"><a href="#首部压缩" class="headerlink" title="首部压缩"></a>首部压缩</h3><p>http2.0是用了专门为头部压缩而设计的算法,减少冗余数据的传输.</p><h3 id="服务端推送"><a href="#服务端推送" class="headerlink" title="服务端推送"></a>服务端推送</h3><p>服务端推送是一种在客户端请求之前发送数据的机制,在HTTP 2.0中,服务端可以对客户端的一个请求发送多个响应.这样可以在客户端下次请求时直接返回推送的缓存.</p><h3 id="同类协议"><a href="#同类协议" class="headerlink" title="同类协议"></a>同类协议</h3><p>SPDY的特性基本和Http 2.0相同,因为http2.0就是收spdy的启发设计的. 主要不同在于对传输数据使用gzip进行压缩.</p><h3 id="iOS端使用"><a href="#iOS端使用" class="headerlink" title="iOS端使用"></a>iOS端使用</h3><p>在iOS下,NSURLSession适配了http2.0的,所以我们可以无感的使用他,而不需要做额外的适配,主要是服务器的配置.</p><h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接:"></a>参考链接:</h2><p><a href="http://www.jianshu.com/p/d3959e5acfac" target="_blank" rel="external">iOS HTTP/2 Server Push 探索</a><br><a href="https://ye11ow.gitbooks.io/http2-explained/content/part3.html" target="_blank" rel="external">http2.0讲解</a><br><a href="">关于 iOS HTTP2.0 的一次学习实践</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;HTTP-2-0&quot;&gt;&lt;a href=&quot;#HTTP-2-0&quot; class=&quot;headerlink&quot; title=&quot;HTTP 2.0&quot;&gt;&lt;/a&gt;HTTP 2.0&lt;/h1&gt;&lt;h2 id=&quot;HTTP-1-0-缺点&quot;&gt;&lt;a href=&quot;#HTTP-1-0-缺点&quot; class
-      
-    
-    </summary>
-    
-    
-      <category term="iOS网络" scheme="http://yoursite.com/tags/iOS%E7%BD%91%E7%BB%9C/"/>
     
   </entry>
   
