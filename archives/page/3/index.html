@@ -346,6 +346,36 @@
     
     
     <article class="index-post">
+        <a class="abstract-title" href = "/2017/11/22/iOS对象判等---hash函数/" >
+            
+                <span>iOS对象判等---hash函数</span>
+        </a>
+        <div class="abstract-content">
+            iOS对象判等—hash函数要比较相等，我们需要实现 isEqual: 方法。我们希望 isEqual: 方法仅在所有属性都相等的时候返回真。Mike Ash 的 Implement Equality and Hashing 和 NSHipster 的 Equality 为我们很好地阐述了如何实现。首先，我们需要写一个 isEqual: 方法：
+1234567891011- (BOOL)isEqual:(id)obj&#123;    if(![obj isKindOfClass:[Person class]]) return NO;    Person* other = (Person...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/11/22</span>
+            </div>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "iOS基础">iOS基础</a>
+    
+</div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
         <a class="abstract-title" href = "/2017/11/22/HTTP 2.0/" >
             
                 <span>HTTP 2.0</span>
@@ -627,46 +657,10 @@ NAT特点
         </div>
     </article>
     
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2017/09/26/iOS自动打包脚本上传至蒲公英/" >
-            
-                <span>iOS自动打包脚本上传至蒲公英</span>
-        </a>
-        <div class="abstract-content">
-            iOS自动打包脚本上传至蒲公英自动打包分为两部分
--生成archive文件-从archive文件中导出ipa包
-
-生成archive包  在这里就需要使用到xcodebuild命令 
-对于普通的project命令为:
-
-xcodebuild archive -project project的名称.xcodeproj -scheme 应用名称 -configuration 构造配置 -archivePath 期望保存的路径
-对于workspace 则命令为xcodebuild archive -workspace workspace的名称.xcworkspace -scheme 应用名称 ...
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/09/26</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "iOS效率">iOS效率</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
     <!-- paginator  -->
     
     <nav class="page-nav">
-        <a class="extend prev" rel="prev" href="/archives/page/2/">&#60; PREV</a><a class="page-number" href="/archives/">1</a><a class="page-number" href="/archives/page/2/">2</a><span class="page-number current">3</span>
+        <a class="extend prev" rel="prev" href="/archives/page/2/">&#60; PREV</a><a class="page-number" href="/archives/">1</a><a class="page-number" href="/archives/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/archives/page/4/">4</a><a class="extend next" rel="next" href="/archives/page/4/">NEXT &#62;</a>
     </nav>
     
 </main>
@@ -1163,9 +1157,14 @@ xcodebuild archive -project project的名称.xcodeproj -scheme 应用名称 -con
     
     
     
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 30
+        Total : 31
         </div>
         <!-- search  -->
         
@@ -1175,6 +1174,20 @@ xcodebuild archive -project project的名称.xcodeproj -scheme 应用名称 -con
     
     
     
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/04</span><a class="archive-post-title" href= "/2019/04/04/MySQL部署 (CenterOS,OSX)/" >MySQL部署</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
     
     <div class="archive-year"> 2018 </div>
     <ul class="year-list">
@@ -1265,12 +1278,12 @@ xcodebuild archive -project project的名称.xcodeproj -scheme 应用名称 -con
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
         </li>
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)/" >Opengl ES 3.0 on iOS--- HelloWord(绘制彩色矩形)</a>
+            <span class="archive-post-date">11/27</span><a class="archive-post-title" href= "/2017/11/27/Opengl ES 3.0 on iOS -- EAGLContext/" >Opengl ES 3.0 on iOS -- EAGLContext</a>
         </li>
     
     
@@ -1280,12 +1293,12 @@ xcodebuild archive -project project的名称.xcodeproj -scheme 应用名称 -con
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
         </li>
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS对象判等---hash函数/" >iOS对象判等---hash函数</a>
+            <span class="archive-post-date">11/22</span><a class="archive-post-title" href= "/2017/11/22/iOS进程消息 -- NSProgressInfo/" >iOS进程信息 -- NSProgressInfo</a>
         </li>
     
     
@@ -1345,11 +1358,13 @@ xcodebuild archive -project project的名称.xcodeproj -scheme 应用名称 -con
     
         <span class="sidebar-tag-name" data-tags="iOS网络"><span class="iconfont-archer">&#xe606;</span>iOS网络</span>
     
-        <span class="sidebar-tag-name" data-tags="Mac开发"><span class="iconfont-archer">&#xe606;</span>Mac开发</span>
-    
         <span class="sidebar-tag-name" data-tags="Python"><span class="iconfont-archer">&#xe606;</span>Python</span>
     
+        <span class="sidebar-tag-name" data-tags="Mac开发"><span class="iconfont-archer">&#xe606;</span>Mac开发</span>
+    
         <span class="sidebar-tag-name" data-tags="第三方框架学习"><span class="iconfont-archer">&#xe606;</span>第三方框架学习</span>
+    
+        <span class="sidebar-tag-name" data-tags="MySQL"><span class="iconfont-archer">&#xe606;</span>MySQL</span>
     
         <span class="sidebar-tag-name" data-tags="P2P"><span class="iconfont-archer">&#xe606;</span>P2P</span>
     
@@ -1361,9 +1376,9 @@ xcodebuild archive -project project的名称.xcodeproj -scheme 应用名称 -con
     
         <span class="sidebar-tag-name" data-tags="iOS效率"><span class="iconfont-archer">&#xe606;</span>iOS效率</span>
     
-        <span class="sidebar-tag-name" data-tags="生产工具"><span class="iconfont-archer">&#xe606;</span>生产工具</span>
-    
         <span class="sidebar-tag-name" data-tags="开源"><span class="iconfont-archer">&#xe606;</span>开源</span>
+    
+        <span class="sidebar-tag-name" data-tags="生产工具"><span class="iconfont-archer">&#xe606;</span>生产工具</span>
     
         <span class="sidebar-tag-name" data-tags="计算机基础"><span class="iconfont-archer">&#xe606;</span>计算机基础</span>
     
